@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/estoque.css' %}">
+{% endblock %}
+
+{% block title %}Painel | Estoque{% endblock %}
+
+{% block content %}
+    {% include 'components/navbar.html' %}
+    <div id="painel">
+        <div id="prod_em_estoque">                        
+            <div>
+                <label>Qtd. Total (Produtos em Estoque)</label>
+            </div>
+            <div>
+                <h4 id="prod_em_estoque_value"></h4>
+            </div>   
+        </div>
+        <div id="cilindros_cheios">            
+            <div>
+                <label>Qtd. Cilindros Cheios</label>
+            </div>  
+            <div>
+                <h4>1600</h4>
+            </div>             
+        </div>
+        <div id="ticket_medio_de_compra">            
+            <div>
+                <label>Ticket Médio de Compra</label>
+            </div>   
+            <div>
+                <h4 id="ticket_medio_de_compra_value"></h4>
+            </div>            
+        </div>
+        <div id="vlr_prod_em_estoque">            
+            <div>
+                <label>Valor Total (Produtos em Estoque)</label>
+            </div> 
+            <div>
+                <h4 id="vlr_prod_em_estoque_value"></h4>
+            </div>           
+        </div>
+        <div id="mapa_locacao">  
+
+        </div>
+        <div id="ranking_compra_por_forn">            
+            <div>
+                <h4>Ranking de Compras <small>(Por Fornecedor)</small></h4>
+            </div> 
+            <div :style="{ maxHeight: '40vh' }">
+                <canvas id="ranking_compras_por_fornecedor_chart"></canvas>
+            </div>           
+        </div>
+        <div id="prod_mais_comprados">            
+            <div>
+                <h4>Top 10 Compras Por Produto</h4>
+            </div>
+            <div :style="{ maxHeight: '40vh' }">
+                <canvas id="ranking_produto_mais_comprado_chart"></canvas>
+            </div> 
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/estoque.js' %}"></script>
+{% endblock %}

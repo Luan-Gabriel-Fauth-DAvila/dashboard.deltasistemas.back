@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section id="cadastro">
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form_usuario }}
+        <input type="submit" value="Enviar">
+    </form>
+
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

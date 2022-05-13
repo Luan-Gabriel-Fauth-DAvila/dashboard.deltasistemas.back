@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/financeiro.css' %}">
+{% endblock %}
+
+{% block title %}Painel | Financeiro{% endblock %}
+
+{% block content %}
+    {% include 'components/navbar.html' %}
+    <section id="painel">
+        <div id="saldo_em_conta">
+            <div>
+                <h4>Saldo em Conta</h4>
+            </div>
+            <div id="banco_data">
+                <div id="banco_total">
+                    <label>Total</label>
+                    <img src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <h6>[[ moneyFilter(saldoDisponivelEmContas_sum) ]]</h6>
+                </div>
+                <div id="banco" v-for="(c, index) in saldoDisponivelEmContas_var" :key="index">
+                    <label>[[ c.nome_banco.toLowerCase() ]]</label>
+                    <img v-if="c.banco === '1'" src="{% static 'public/bancos/bb.png' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else-if="c.banco === '260'" src="{% static 'public/bancos/nu.png' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else-if="c.banco === '184'" src="{% static 'public/bancos/itau.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else-if="c.banco === '33'" src="{% static 'public/bancos/santander.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else-if="c.banco === '748'" src="{% static 'public/bancos/sicredi.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <h6>[[ moneyFilter(c.valor) ]]</h6>
+                </div>
+            </div>
+        </div>
+        <div id="cr_atrasado">
+            <div id="cpr_title">
+                <label>Contas a receber</label><small>(atrasado)</small>
+            </div>
+            <div id="cpr_value">
+                <h4 id="cr_atrasado_value">Sem dados</h4>
+            </div>
+        </div>
+        <div id="cr_vencer">
+            <div id="cpr_title">
+                <label>Contas a receber</label><small>(a vencer)</small>
+            </div>
+            <div id="cpr_value">
+                <h4 id="cr_vencer_value">Sem dados</h4>
+            </div>
+        </div>
+        <div id="cp_atrasado">
+            <div id="cpr_title">
+                <label>Contas a pagar</label><small>(atrasado)</small>
+            </div>
+            <div id="cpr_value">
+                <h4 id="cp_atrasado_value">Sem dados</h4>
+            </div>
+        </div>
+        <div id="cp_vencer">
+            <div id="cpr_title">
+                <label>Contas a pagar</label><small>(a vencer)</small>
+            </div>
+            <div id="cpr_value">
+                <h4 id="cp_vencer_value">Sem dados</h4>
+            </div>
+        </div>
+        <div id="contas_a_receber">
+            <div>
+                <h4>Contas a Receber <small>(dia)</small></h4>
+            </div>
+            <div :style="{ height: '24vh' }">
+                <canvas id="contas_a_receber_chart"></canvas>
+            </div>
+        </div>
+        <div id="contas_a_pagar">
+            <div>
+                <h4>Contas a Pagar <small>(dia)</small></h4>
+            </div>
+            <div :style="{ height: '24vh' }">
+                <canvas id="contas_a_pagar_chart"></canvas>
+            </div>
+        </div>
+        <div id="recebimentos_por_forma">
+            <div>
+                <h4>Recebimentos por forma</h4>
+            </div>
+            <div style="max-height: 30vh;">
+                <canvas id="recebimentos_por_forma_chart"></canvas>
+            </div>
+        </div>
+        <div id="emprestimos">
+            <div id="emprestimos_title">
+                <h4>Empréstimos <small>(saldo)</small></h4><h3 :style="{ color: '#FF869C', fontSize: '3vh' }">[[ detalhesFinaciamentoEmprestimo_total ]]</h3>
+            </div>
+            <div>
+                <div id="container_principal" v-for="(r, index) in detalhesFinaciamentoEmprestimo_var" :key="index">
+                    <div id='barra_total'>
+                        <div id="barra_porcentagem" :style="{ width: tamanhoBarra(r.valor, detalhesFinaciamentoEmprestimo_sum) + '%' }">
+                            <p>
+                                <b id="barra_valor">[[ moneyFilter(r.valor) ]]</b> | <b id="barra_cliente"> [[ r.nome ]]</b> 
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="fluxo_de_caixa">
+            <div>
+                <h4>Fluxo de Caixa <small>(para os próximos 20 dias)</small></h4>
+            </div>
+            <div :style="{ height: '30vh' }">
+                <canvas id="fluxo_20_dias_chart"></canvas>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/financeiro.js' %}"></script>
+{% endblock %}
