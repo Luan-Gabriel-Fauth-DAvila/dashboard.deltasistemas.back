@@ -15,6 +15,7 @@ def conn():
         user='SYSDBA',
         password='masterkey',
         port=58002,
+        charset='UNICODE_FSS'
     )
     return conn
 
