@@ -23,6 +23,7 @@ def home(request):
     return redirect('/accounts/login/?next=/painel/comercial/')
     # return render(request, 'home.html')
 
+@csrf_exempt
 def login(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -41,6 +42,7 @@ def login(request):
         form_login = AuthenticationForm()
         return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
 
+@csrf_exempt
 @login_required
 def cadastro(request):
     if request.method == "POST":
