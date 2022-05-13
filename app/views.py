@@ -25,22 +25,25 @@ def home(request):
 
 @csrf_exempt
 def login(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        usuario = auth.authenticate(request, username=username, password=password)
-        if usuario is not None:
-            auth.login(request, usuario)
-            if request.POST['next']:
-                return redirect(request.POST['next'])
+    if request.session['_auth_user_id']:
+        if request.method == "POST":
+            username = request.POST["username"]
+            password = request.POST["password"]
+            usuario = auth.authenticate(request, username=username, password=password)
+            if usuario is not None:
+                auth.login(request, usuario)
+                if request.POST['next']:
+                    return redirect(request.POST['next'])
+                else:
+                    return redirect('/painel/comercial/')
             else:
-                return redirect('/painel/comercial/')
+                form_login = AuthenticationForm()
+                return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.POST['next']})
         else:
             form_login = AuthenticationForm()
-            return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.POST['next']})
-    else:
-        form_login = AuthenticationForm()
-        return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
+            return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
+    
+    return redirect('/painel/comercial/')
 
 @csrf_exempt
 @login_required
