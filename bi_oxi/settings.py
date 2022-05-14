@@ -28,7 +28,7 @@ DEBUG = True
 # CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = ['dashboard.deltasistemas.net',
-                'http://127.0.0.1:8000/',
+                '127.0.0.1',
                 '18.231.147.0']
 
 # SECURE_HSTS_SECONDS = False
