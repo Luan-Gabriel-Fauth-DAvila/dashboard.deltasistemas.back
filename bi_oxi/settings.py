@@ -55,17 +55,17 @@ STATICFILES_DIRS = [
     BASE_DIR / "app/static/",
 ]
 
-# TEMPLATE_CONTEXT_PROCESSORS = (    
-#     'django.core.context_processors.request',
-#     'django.core.context_processors.static'
-# )
+TEMPLATE_CONTEXT_PROCESSORS = (    
+    'django.core.context_processors.request',
+    'django.core.context_processors.static'
+)
 
-# STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
+STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
-# STATICFILES_FINDERS = (
-#     'django.contrib.staticfiles.finders.FileSystemFinder',
-#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# )
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
