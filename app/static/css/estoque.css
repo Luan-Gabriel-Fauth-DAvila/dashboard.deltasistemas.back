@@ -3,7 +3,7 @@ h4 {
 }
 h2 {
     font-size: 3vh;
-    line-height: 2vh;
+    line-height: 3vh;
 }
 small {
     line-height: 2.5vh;
@@ -27,7 +27,7 @@ label {
 #painel {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
-    grid-template-rows: 20vh 80vh 50vh;
+    grid-template-rows: 15vh 80vh 50vh;
     grid-template-areas:    "prod_em_estoque cilindros_cheios ticket_medio_de_compra vlr_prod_em_estoque"
                             "mapa_locacao mapa_locacao mapa_locacao mapa_locacao "
                             "ranking_compra_por_forn ranking_compra_por_forn prod_mais_comprados prod_mais_comprados";
