@@ -138,18 +138,23 @@ html, body {
         height: 8vh;
         border-radius: 1vh; 
     }
-    
-    #menu-drop #drop-content {
+    #menu-drop #div-menu_link {
         display: none;
-
+    }
+    #menu-drop:hover #div-menu_link {
+        display: block;
+    }
+    #menu-drop #drop-content {
+        position: absolute;
+        height: 0;
         line-height: 8vh;
         border-radius: 1vh;
-        background-color: white; 
-        position: absolute;
+        background-color: rgba(255, 255, 255, 0); 
+        transition: .3s ease-in-out;
     }
-    
     #menu-drop:hover #drop-content {
-        display: block;
+        height: 24vh;
         background-color: white; 
+        color: white;
     }
 }

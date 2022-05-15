@@ -101,6 +101,8 @@ small {
     justify-content: flex-start;
     align-items: center;
     height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
 #banco_total {
     display: flex;
