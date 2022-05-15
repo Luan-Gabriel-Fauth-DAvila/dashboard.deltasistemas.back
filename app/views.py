@@ -759,7 +759,7 @@ def vendas_por_agrupamento_mensal(request):
         item_devolucao is null
 
     group by 2
-    order by 1
+    order by 1 
         """)
     d = {
         'total_vendas': [],

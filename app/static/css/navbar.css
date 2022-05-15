@@ -26,19 +26,23 @@ html, body {
     align-items: center;
     background-color: #ffffff;
 }
-@media only screen and (max-width: 600px) {
-  #navbar {
-    }
-}
 #nav-left {
     width: 50%;
     
     display: flex;
     justify-content: space-between;
 }
+#nav-desktop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    width: 100%;
+}
+#nav-mobile {
+    display: none;
+}
 #image {
-    grid-area: logo;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -80,8 +84,6 @@ html, body {
     transform: translateY(3.2vh);
 }
 #perfil {
-    grid-area: perfil;
-    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -96,37 +98,58 @@ html, body {
     border-radius: 3vh;
 }
 
-/* Style the navigation menu */
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-  position: relative;
+#menu-drop {
+    display: none;
 }
+@media only screen and (max-width: 600px) {
+    #navbar {
+        padding: 0 2%;
+    }
+    #nav-desktop {
+        display: none;
+    }
+    #nav-mobile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        width: 100%;
+    }
+    #menu-d {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #menu-drop {
+        display: block;
+    }
+    
+    #menu-drop #drop {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-/* Style navigation menu links */
-.topnav a {
-  color: white;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  display: block;
-}
+        border: none;
+        cursor: pointer;
+        background-color: white;
+        padding: 10px;
+        color: #1B2559;
+        width: 8vh;
+        height: 8vh;
+        border-radius: 1vh; 
+    }
+    
+    #menu-drop #drop-content {
+        display: none;
 
-/* Style the hamburger menu */
-.topnav a.icon {
-  background: black;
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-.active {
-    height: 40vh;
-    opacity: 1;
-    transition: .5 ease-in-out;
-}
-.deactive {
-    height: 0;
-    opacity: 0;
-    transition: .5 ease-in-out;
+        line-height: 8vh;
+        border-radius: 1vh;
+        background-color: #e1e1e1; 
+        position: absolute;
+    }
+    
+    #menu-drop:hover #drop-content {
+        display: block;
+        background-color: #e1e1e1; 
+    }
 }

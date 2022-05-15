@@ -23,19 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = False
 # CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = ['dashboard.deltasistemas.net',
                 '127.0.0.1',
                 '18.231.147.0']
 
-# SECURE_HSTS_SECONDS = False
+SECURE_HSTS_SECONDS = True
 
-# SECURE_HSTS_PRELOAD = False
+SECURE_HSTS_PRELOAD = True
 
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 # SECURE_SSL_REDIRECT = False #if method == 'p' else False
 
@@ -47,7 +46,7 @@ MEDIA_ROOT = 'app/static/media/'
 
 MEDIA_URL = 'media/'
 
-STATIC_ROOT = 'staticfiles/'
+STATIC_ROOT = BASE_DIR / 'staticfiles/'
 
 STATIC_URL = 'static/'
 
@@ -62,11 +61,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -76,8 +70,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'app',
-    'corsheaders',
-    'rest_framework',
+    # 'corsheaders',
+    # 'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -49,4 +49,4 @@ urlpatterns = [
     path('ranking_produto_mais_comprado/', views.ranking_produto_mais_comprado),                                                ##utilizado                                              
     path('ticket_medio_de_compra/', views.ticket_medio_de_compra),                                                              ##utilizado                                                 
     path('total_de_valores_de_todos_os_produtos/', views.total_de_valores_de_todos_os_produtos),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]

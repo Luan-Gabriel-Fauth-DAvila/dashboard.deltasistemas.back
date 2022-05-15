@@ -107,6 +107,17 @@ small {
     border-radius: 2vh;
     padding: 2vh 2vh;
 }
+#mapa-img {
+    width: 90%;
+    height: 90%;
+    border-radius: 2vh;
+    margin: auto auto;
+    background-size: cover;
+    background-position: center;
+}
+#mapa-title {
+    margin-bottom: 2vh;
+}
 #ranking_compra_por_forn {
     grid-area: ranking_compra_por_forn;
     color: #1B2559;
