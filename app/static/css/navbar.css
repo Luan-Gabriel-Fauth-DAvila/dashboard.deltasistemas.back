@@ -144,12 +144,12 @@ html, body {
 
         line-height: 8vh;
         border-radius: 1vh;
-        background-color: #e1e1e1; 
+        background-color: white; 
         position: absolute;
     }
     
     #menu-drop:hover #drop-content {
         display: block;
-        background-color: #e1e1e1; 
+        background-color: white; 
     }
 }

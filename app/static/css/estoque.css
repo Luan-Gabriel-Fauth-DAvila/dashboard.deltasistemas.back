@@ -1,21 +1,27 @@
 h4 {
     line-height: 2.5vh;
-    font-size: 2.5vh;
-    font-weight: bold;
 }
-h5 {
-    line-height: 2.5vh;
-    font-size: 2vh;
-    font-weight: bold;
-}
-label {
-    line-height: 2.5vh;
-    font-size: 1.5vh;
+h2 {
+    font-size: 3vh;
+    line-height: 2vh;
 }
 small {
     line-height: 2.5vh;
+    font-size: 1vh;
+}
+h6 {
+    margin-left: 1vh;
     font-size: 1.5vh;
-    font-weight: normal !important;
+    font-weight: bold;
+}
+label {
+    margin: unset;
+    padding: unset;
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+
+    display: flex;
+    align-items: center;
 }
 
 #painel {
@@ -32,7 +38,7 @@ small {
   #painel {
         display: grid;
         grid-template-columns: 50% 50%;
-        grid-template-rows: 20vh 20vh 80vh 50vh 50vh;
+        grid-template-rows: 15vh 15vh 80vh 50vh 50vh;
     grid-template-areas:    "prod_em_estoque cilindros_cheios"
                             "ticket_medio_de_compra vlr_prod_em_estoque"
                             "mapa_locacao mapa_locacao"
