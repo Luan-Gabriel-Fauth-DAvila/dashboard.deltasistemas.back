@@ -1,21 +1,27 @@
-h4 {
-    line-height: 2.5vh;
-    font-size: 2.5vh;
-    font-weight: bold;
-}
-h5 {
-    line-height: 2.5vh;
-    font-size: 2vh;
-    font-weight: bold;
-}
-label {
-    line-height: 2.5vh;
-    font-size: 1.5vh;
-}
 small {
     line-height: 2.5vh;
+    font-size: 1vh;
+}
+label {
+    margin: unset;
+    padding: unset;
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+
+    display: flex;
+    align-items: center;
+}
+h2 {
+    font-size: 3vh;
+    line-height: 3vh;
+}
+h4 {
+    line-height: 2.5vh;
+}
+h6 {
+    margin-left: 1vh;
     font-size: 1.5vh;
-    font-weight: normal !important;
+    font-weight: bold;
 }
 
 
@@ -101,7 +107,7 @@ small {
     justify-content: flex-start;
     align-items: center;
     height: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
 }
 #banco_total {
@@ -121,7 +127,7 @@ small {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 15vh;
+    min-width: 12vh;
     height: 15vh;
     margin: 2vh;
     /* background-color: #e5e5e5; */

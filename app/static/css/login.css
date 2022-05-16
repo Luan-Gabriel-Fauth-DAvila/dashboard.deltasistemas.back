@@ -7,6 +7,31 @@
   font-family: 'Poppins', sans-serif;
   /* border: 1px solid salmon; */
 }
+small {
+    line-height: 2.5vh;
+    font-size: 1vh;
+}
+label {
+    margin: unset;
+    padding: unset;
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+
+    display: flex;
+    align-items: center;
+}
+h2 {
+    font-size: 3vh;
+    line-height: 3vh;
+}
+h4 {
+    line-height: 2.5vh;
+}
+h6 {
+    margin-left: 1vh;
+    font-size: 1.5vh;
+    font-weight: bold;
+}
 html, body {
     width: 100vw;
     height: 100vh;
@@ -30,6 +55,17 @@ html, body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+@media only screen and (max-width:600px) {
+    #login {
+        grid-template-areas: "login login"
+    }
+    #login_info {
+        display: none;
+    }
+    #login_screen {
+    background: linear-gradient(180deg,#6452FF,#3b2cc2);
+    }
 }
 #image {
     height: 35%;
@@ -122,7 +158,6 @@ input:focus-visible {
 }
 label {
     color: white;
-    font-size: .8vw;
 }
 #submit {
     background-color: #05CD99;
