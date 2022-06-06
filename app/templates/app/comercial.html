@@ -14,14 +14,14 @@
         <div id="total_vendas">
             <div>
                 <label>total de vendas</label>
-                <h4 id='total_vendas_value'></h4>
+                <h4 id='total_vendas_value'>Sem dados</h4>
             </div>
             <span class="material-icons-outlined">trending_up</span>
         </div>
         <div id="total_cmv">
             <div>
                 <label>CMV</label>
-                <h4 id="total_cmv_value"></h4>
+                <h4 id="total_cmv_value">Sem dados</h4>
             </div>
             <span class="material-icons-outlined">leaderboard</span>
         </div>
@@ -29,14 +29,14 @@
             <span class="material-icons-outlined">assessment</span>
             <div>
                 <label>Lucro bruto</label>
-                <h4 id="total_lucro_bruto_value"></h4>
+                <h4 id="total_lucro_bruto_value">Sem dados</h4>
             </div>
         </div>
         <div id="valor_em_locacao">
             <span class="material-icons-outlined">payments</span>
             <div>
                 <label>Valor em locação <small>(mensal)</small></label>
-                <h4>R$ NaN</h4>
+                <h4>Sem dados</h4>
             </div>
         </div>
         <div id="total_vendas_mensal">
@@ -68,7 +68,8 @@
                     <h6 id="barra_cliente"  v-else >Sem dados</h6>
                     <div id='barra_meta_vendas'>
                         <div id="barra_porcentagem" :style="{ backgroundColor: colors[2], width: tamanhoBarra(metadevendas_atual, metadevendas_total) }">
-                            <b id="barra_valor">[[ tamanhoBarra(metadevendas_atual, metadevendas_total) ]] %</b>
+                            <b id="barra_valor" v-if="metadevendas_total">[[ tamanhoBarra(metadevendas_atual, metadevendas_total) ]] %</b>
+                            <b id="barra_valor" v-else>Sem Dados</b>
                         </div>
                     </div>
                 </div>

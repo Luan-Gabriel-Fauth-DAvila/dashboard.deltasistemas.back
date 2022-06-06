@@ -1,8 +1,10 @@
+from distutils.log import error
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib import auth
 from django.contrib.auth.models import User
 import fdb
@@ -19,77 +21,121 @@ def conn():
     )
     return conn
 
-def home(request):
-    return redirect('/accounts/login/?next=/painel/comercial/')
-    # return render(request, 'home.html')
+# def home(request):
+#     return redirect('/accounts/login/?next=/painel/comercial/')
+#     # return render(request, 'home.html')
 
-@csrf_exempt
-def login(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        usuario = auth.authenticate(request, username=username, password=password)
-        if usuario is not None:
-            auth.login(request, usuario)
-            if request.POST['next']:
-                return redirect(request.POST['next'])
-            else:
-                return redirect('/painel/comercial/')
+# @csrf_exempt
+# def login(request):
+#     if request.method == "POST":
+#         username = request.POST["username"]
+#         password = request.POST["password"]
+#         usuario = auth.authenticate(request, username=username, password=password)
+#         if usuario is not None:
+#             auth.login(request, usuario)
+#             if request.POST['next']:
+#                 return redirect(request.POST['next'])
+#             else:
+#                 return redirect('/painel/comercial/')
+#         else:
+#             form_login = AuthenticationForm()
+#             return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.POST['next']})
+#     else:
+#         form_login = AuthenticationForm()
+#         return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
+
+# @csrf_exempt
+# @login_required
+# def cadastro(request):
+#     if request.method == "POST":
+#         form_usuario = UserCreationForm(request.POST)
+#         if form_usuario.is_valid():
+#             form_usuario.save()
+#             return redirect('/accounts/login/')
+#     else:
+#         form_usuario = UserCreationForm()
+#     return render(request, 'accounts/cadastro.html', {'form_usuario': form_usuario})
+
+# @login_required
+# def comercial(request):
+    
+    
+#     return render(request, 'app/comercial.html', {'page': 1})
+
+# @login_required
+# def financeiro(request):
+    
+
+#     return render(request, 'app/financeiro.html', {'page': 2})
+
+# @login_required
+# def estoque(request):
+    
+
+#     return render(request, 'app/estoque.html', {'page': 3})
+
+
+
+
+def filters(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
         else:
-            form_login = AuthenticationForm()
-            return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.POST['next']})
-    else:
-        form_login = AuthenticationForm()
-        return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
-
-@csrf_exempt
-@login_required
-def cadastro(request):
-    if request.method == "POST":
-        form_usuario = UserCreationForm(request.POST)
-        if form_usuario.is_valid():
-            form_usuario.save()
-            return redirect('/accounts/login/')
-    else:
-        form_usuario = UserCreationForm()
-    return render(request, 'accounts/cadastro.html', {'form_usuario': form_usuario})
-
-@login_required
-def comercial(request):
+            data_filter = "dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from dtacomp) = extract(year from current_date)'''
     
-    
-    return render(request, 'app/comercial.html', {'page': 1})
-
-@login_required
-def financeiro(request):
-    
-
-    return render(request, 'app/financeiro.html', {'page': 2})
-
-@login_required
-def estoque(request):
-    
-
-    return render(request, 'app/estoque.html', {'page': 3})
-
-
-
-
-
+    return data_filter
 
 def total_vendas(request):
     con = conn()
     cur = con.cursor()
     cur.execute("""
         select 
-            sum(v.total_venda)
+            sum(total_venda) as total_vendas
 
-        from vendas as v
+        from (select
+            venda_id,tipo_nd,
+            dtacomp,valor,
+            acrescimo,
+            desconto,
+            total,
+            +(+qtd),
+            +(+total_venda),
+            OBS
+
+        from vendas v
 
         where
-            extract(month from v.dtacomp) = extract(month from current_date) and
-            extract(year from v.dtacomp) = extract(year from current_date)
-    """)
+            codfilial = '1' AND
+            IDN_CANCELADA = 'N' AND
+            TIPO_ND = 'N' and
+            """ + filters(request) + """
+
+        union all
+        
+        select
+            venda_id,
+            tipo_nd,
+            dtacomp,
+            valor,
+            acrescimo,
+            desconto,
+            total,
+            +(-qtd),
+            +(-total_venda),
+            OBS
+
+        from vendas v
+
+        where
+            codfilial = '1' AND
+            IDN_CANCELADA = 'N' AND
+            TIPO_ND = 'D' and
+            """ + filters(request) + """)""")
     
     for c in cur.fetchall():
         d = {
@@ -119,6 +165,14 @@ def total_vendas(request):
 #     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def total_vendas_mensal(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = 'extract(year from dtacomp) = extract(year from current_date)'
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -161,7 +215,7 @@ def total_vendas_mensal(request):
             codfilial = '1' AND
             IDN_CANCELADA = 'N' AND
             TIPO_ND = 'N' and
-            extract(year from dtacomp) = extract(year from current_date)
+            """ + data_filter + """
 
         union all
         
@@ -183,7 +237,7 @@ def total_vendas_mensal(request):
             codfilial = '1' AND
             IDN_CANCELADA = 'N' AND
             TIPO_ND = 'D' and
-            extract(year from dtacomp) = extract(year from current_date))
+            """ + data_filter + """)
 
     group by
         extract(month from dtacomp),
@@ -202,7 +256,7 @@ def total_vendas_mensal(request):
     for c in cur.fetchall():
         d['qtd_vendas'].append(str(c[0]))
         d['qtd_itens'].append(str(c[1]))
-        d['total_vendas'].append(str(c[2]))
+        d['total_vendas'].append(float(c[2]))
         d['mes'].append(str(c[3]))
         d['dscmes'].append(str(c[4]))
         d['ano'].append(str(c[5]))
@@ -247,7 +301,9 @@ def ranking_produto_mais_comprado(request):
         INNER JOIN COMPRAS AS C ON C.COMPRA_ID = CI.COMPRA_ID
         INNER JOIN PRODUTOS AS P ON P.CODPRODUTO = CI.PRODUTO
 
-    WHERE C.IDN_CANCELADA = 'N'
+    WHERE 
+        C.IDN_CANCELADA = 'N' AND
+        C.DATA_ENTRADA BETWEEN CURRENT_DATE -30 AND CURRENT_DATE
 
     ORDER BY CI.QUANTIDADE DESC
     """)
@@ -276,6 +332,9 @@ def total_de_recebimentos_por_forma_mensal_resumo_geral(request):
         SUM(TOTAL_DEBITOS_BANCARIOS) as ENTRADAS_BANCOS
                                                                                                         
     FROM CAIXA_MOVTO 
+
+    where
+        extract(month from data) = extract(month from current_date)
     """)
     for c in cur.fetchall():
         d = {
@@ -364,6 +423,16 @@ def contas_a_pagar_do_inicio_ate_a_data_atual(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def total_de_vendas_por_vendedor(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)'''
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -377,20 +446,21 @@ def total_de_vendas_por_vendedor(request):
 
     WHERE 
         V.IDN_CANCELADA = 'N' AND 
-        extract(month from v.dtacomp) = extract(month from current_date) and
-        extract(year from v.dtacomp) = extract(year from current_date)
+        """ + data_filter + """
 
     group by v.vendedor, pc.nome
 
     ORDER BY sum(V.VALOR) DESC 
     """)
-    d = []
+    d = {
+        'valor': [],
+        'codvendedor': [],
+        'nome': [],
+    }
     for c in cur.fetchall():
-        d.append({
-            'valor': str(c[0]),
-            'codvendedor': str(c[1]),
-            'nome': str(c[2]),
-        })
+        d['valor'].append(float(c[0]))
+        d['codvendedor'].append(str(c[1]))
+        d['nome'].append(str(c[2]))
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
@@ -501,6 +571,16 @@ def mapa_de_locacoes(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def total_cmv(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)'''
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -512,8 +592,8 @@ def total_cmv(request):
 
     WHERE
         V.IDN_CANCELADA = 'N' AND
-        V.CODOPER IN (111,107,112,113)
-    """)
+        V.CODOPER IN (111,107,112,113) and 
+        """ + data_filter)
     for c in cur.fetchall():
         d = {
             'total_cmv': str(c[0]),
@@ -662,6 +742,16 @@ def qtd_produtos_em_estoque(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def lucro_bruto_mensal(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)'''
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -671,14 +761,12 @@ def lucro_bruto_mensal(request):
         SUM(DESCONTO) AS DESCONTO,
         SUM(+(+TOTAL)) AS TOTAL_FINAL
 
-    FROM VENDAS
+    FROM VENDAS V
 
     WHERE
         IDN_CANCELADA = 'N' AND
         CODOPER IN (111,107,112,113) AND
-        EXTRACT (MONTH FROM DTACOMP) = EXTRACT (MONTH FROM DATE 'TODAY') AND
-        EXTRACT (YEAR FROM DTACOMP) = EXTRACT (YEAR FROM DATE 'TODAY')
-        """)
+        """ + data_filter)
     #UNION ALL
 
     # SELECT
@@ -710,6 +798,8 @@ def lucro_bruto_mensal(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def total_lucro_bruto(request):
+    
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -719,12 +809,13 @@ def total_lucro_bruto(request):
         SUM(DESCONTO) AS DESCONTO,
         SUM(+(+TOTAL)) AS TOTAL_FINAL
 
-    FROM VENDAS
+    FROM VENDAS V
 
     WHERE
-        IDN_CANCELADA = 'N' AND
-        CODOPER IN (111,107,112,113)
-    """)
+        V.IDN_CANCELADA = 'N' AND
+        V.CODOPER IN (111,107,112,113) and
+        """ + data_filter)
+    print(data_filter)
     d = {
         'valor_total': [],
         'acrescimo': [],
@@ -741,6 +832,17 @@ def total_lucro_bruto(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def vendas_por_agrupamento_mensal(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)
+        '''
+    
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -754,8 +856,7 @@ def vendas_por_agrupamento_mensal(request):
         inner join agrupamentos as ag on (p.codgrupo = ag.codgrupo)
 
     where
-        extract(month from v.dtacomp) = extract(month from current_date) and
-        extract(year from v.dtacomp) = extract(year from current_date) and
+        """ + data_filter + """ and
         item_devolucao is null
 
     group by 2
@@ -763,16 +864,25 @@ def vendas_por_agrupamento_mensal(request):
         """)
     d = {
         'total_vendas': [],
-        'dscagrupamento': [],
+        'dscagrupamento': []
     }
     for c in cur.fetchall():
-        d['total_vendas'].append(str(c[0]).title())
-        d['dscagrupamento'].append(str(c[1]).title())
-
+        d['total_vendas'].append(float(c[0]))
+        d['dscagrupamento'].append(str(c[1]))
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def ranking_de_vendas_por_cliente(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)'''
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -785,23 +895,34 @@ def ranking_de_vendas_por_cliente(request):
         inner join parceiros as p on v.parceiro = p.parceiro
 
     where
-        extract(month from v.dtacomp) = extract(month from current_date) and
-        extract(year from v.dtacomp) = extract(year from current_date) 
+        """ + data_filter + """
     group by 1,2
     order by 3 desc
         """)
 
-    d = []
+    d = {
+        'codcliente': [],
+        'nome': [],
+        'total_vendas': [],
+    }
     for c in cur.fetchall():
-        d.append({
-            'codcliente': str(c[0]),  
-            'nome': str(c[1]),
-            'total_vendas': str(c[2]),
-        })
+        d['codcliente'].append(float(c[0]))
+        d['nome'].append(str(c[1]))
+        d['total_vendas'].append(float(c[2]))
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def ranking_de_vendas_por_produto(request):
+    try:
+        if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            data_filter = "v.dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
+    except MultiValueDictKeyError:
+        data_filter = '''
+        extract(month from v.dtacomp) = extract(month from current_date) and
+        extract(year from v.dtacomp) = extract(year from current_date)'''
+
     con = conn()
     cur = con.cursor()
     cur.execute("""
@@ -815,8 +936,7 @@ def ranking_de_vendas_por_produto(request):
         inner join vendas as v on vi.venda_id = v.venda_id
         inner join produtos as p on p.codproduto = vi.codproduto
     where 
-        extract(month from v.dtacomp) = extract(month from current_date) and
-        extract(year from v.dtacomp) = extract(year from current_date)
+        """ + data_filter + """
 
     group by 1, 2
     order by 3 desc
@@ -911,8 +1031,7 @@ def contas_a_receber_por_ranking_e_dia(request):
         FP.DOCTO,
         FP.RECEITA_PRINCIPAL,
         R.DSCRECEITA,
-        PC.PARCEIRO,
-        PC.NOME,
+        PC.PARCEIRO || '-' || PC.NOME as PARCEIRO,
         FPP.PARCELA,
         FPP.DATA_VENCIMENTO,
         FPP.SALDO,
@@ -944,23 +1063,21 @@ def contas_a_receber_por_ranking_e_dia(request):
         'despesa_principal': [],
         'dscdespesa': [],
         'parceiro': [],
-        'nome': [],
         'parcela': [],
         'data_vencimento': [],
         'saldo': [],
         'historico': [],
     }
     for c in cur.fetchall():
-        d['fatura_receber_id'].append(str(c[0]))
+        d['faturas_receber_id'].append(str(c[0]))
         d['docto'].append(str(c[1]))
         d['despesa_principal'].append(str(c[2]))
         d['dscdespesa'].append(str(c[3]))
         d['parceiro'].append(str(c[4]))
-        d['nome'].append(str(c[5]))
-        d['parcela'].append(str(c[6]))
-        d['data_vencimento'].append(str(c[7]))
-        d['saldo'].append(str(c[8]))
-        d['historico'].append(str(c[9]))
+        d['parcela'].append(str(c[5]))
+        d['data_vencimento'].append(str(c[6]))
+        d['saldo'].append(str(c[7]))
+        d['historico'].append(str(c[8]))
 
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
@@ -1082,7 +1199,7 @@ def rankingComprasPorFornecedor(request):
         INNER JOIN PARCEIROS AS P ON P.PARCEIRO = C.PARCEIRO
 
     WHERE 
-        C.DATA_ENTRADA BETWEEN CURRENT_DATE -90 AND CURRENT_DATE
+        C.DATA_ENTRADA BETWEEN CURRENT_DATE -30 AND CURRENT_DATE
 
     GROUP BY 1,2
     ORDER BY VALOR_NOTA DESC
@@ -1108,121 +1225,226 @@ def fluxo_de_caixa(request):
         /* TOTAL A PAGAR E RECEBER  HOJE */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_HOJE FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)),
+        cast(extract (day from current_date) as varchar(2))|| '/' ||cast(extract (month from current_date) as varchar(2)) as data0,
         /* TOTAL A PAGAR E RECEBER  DIA 01 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +1)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_01 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +1)),
+        cast(extract (day from current_date+1) as varchar(2))|| '/' ||cast(extract (month from current_date+1) as varchar(2)) as data1,
         /* TOTAL A PAGAR E RECEBER  DIA 02 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_02 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +2)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_02 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +2)),
+        cast(extract (day from current_date+2) as varchar(2))|| '/' ||cast(extract (month from current_date+2) as varchar(2)) as data2,
         /* TOTAL A PAGAR E RECEBER  DIA 03 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_03 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +3)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_03 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +3)),
+        cast(extract (day from current_date+3) as varchar(2))|| '/' ||cast(extract (month from current_date+3) as varchar(2)) as data3,
         /* TOTAL A PAGAR E RECEBER  DIA 04 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_04 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +4)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_04 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +4)),
+        cast(extract (day from current_date+4) as varchar(2))|| '/' ||cast(extract (month from current_date+4) as varchar(2)) as data4,
         /* TOTAL A PAGAR E RECEBER  DIA 05 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_05 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +5)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_05 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +5)),
+        cast(extract (day from current_date+5) as varchar(2))|| '/' ||cast(extract (month from current_date+5) as varchar(2)) as data5,
         /* TOTAL A PAGAR E RECEBER  DIA 06 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_06 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +6)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_06 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +6)),
+        cast(extract (day from current_date+6) as varchar(2))|| '/' ||cast(extract (month from current_date+6) as varchar(2)) as data6,
         /* TOTAL A PAGAR E RECEBER  DIA 07 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_07 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +7)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_07 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +7)),
+        cast(extract (day from current_date+7) as varchar(2))|| '/' ||cast(extract (month from current_date+7) as varchar(2)) as data7,
         /* TOTAL A PAGAR E RECEBER  DIA 08 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_08 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +8)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_08 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +8)),
+        cast(extract (day from current_date+8) as varchar(2))|| '/' ||cast(extract (month from current_date+8) as varchar(2)) as data8,
         /* TOTAL A PAGAR E RECEBER  DIA 09 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_09 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +9)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_09 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +9)),
+        cast(extract (day from current_date+9) as varchar(2))|| '/' ||cast(extract (month from current_date+9) as varchar(2)) as data9,
         /* TOTAL A PAGAR E RECEBER  DIA 10 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_10 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +10)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_10 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +10)),
+        cast(extract (day from current_date+10) as varchar(2))|| '/' ||cast(extract (month from current_date+10) as varchar(2)) as data10,
         /* TOTAL A PAGAR E RECEBER  DIA 11 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_11 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +11)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_11 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +11)),
+        cast(extract (day from current_date+11) as varchar(2))|| '/' ||cast(extract (month from current_date+11) as varchar(2)) as data11,
         /* TOTAL A PAGAR E RECEBER  DIA 12 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_12 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +12)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_12 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +12)),
+        cast(extract (day from current_date+12) as varchar(2))|| '/' ||cast(extract (month from current_date+12) as varchar(2)) as data12,
         /* TOTAL A PAGAR E RECEBER  DIA 13 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_13 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +13)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_13 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +13)),
+        cast(extract (day from current_date+13) as varchar(2))|| '/' ||cast(extract (month from current_date+13) as varchar(2)) as data13,
         /* TOTAL A PAGAR E RECEBER  DIA 14 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_14 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +14)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_14 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +14)),
+        cast(extract (day from current_date+14) as varchar(2))|| '/' ||cast(extract (month from current_date+14) as varchar(2)) as data14,
         /* TOTAL A PAGAR E RECEBER  DIA 15 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_15 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +15)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_15 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +15)),
+        cast(extract (day from current_date+15) as varchar(2))|| '/' ||cast(extract (month from current_date+15) as varchar(2)) as data15,
         /* TOTAL A PAGAR E RECEBER  DIA 16 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_16 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +16)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_16 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +16)),
+        cast(extract (day from current_date+16) as varchar(2))|| '/' ||cast(extract (month from current_date+16) as varchar(2)) as data16,
         /* TOTAL A PAGAR E RECEBER  DIA 17 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_17 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +17)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_17 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +17)),
+        cast(extract (day from current_date+17) as varchar(2))|| '/' ||cast(extract (month from current_date+17) as varchar(2)) as data17,
         /* TOTAL A PAGAR E RECEBER  DIA 18 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_18 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +18)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_18 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +18)),
+        cast(extract (day from current_date+18) as varchar(2))|| '/' ||cast(extract (month from current_date+18) as varchar(2)) as data18,
         /* TOTAL A PAGAR E RECEBER  DIA 19 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_19 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +19)),
         (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_19 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +19)),
+        cast(extract (day from current_date+19) as varchar(2))|| '/' ||cast(extract (month from current_date+19) as varchar(2)) as data19,
         /* TOTAL A PAGAR E RECEBER  DIA 20 */
         (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_20 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +20)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_20 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +20))
-
+        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_20 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +20)),
+        cast(extract (day from current_date+20) as varchar(2))|| '/' ||cast(extract (month from current_date+20) as varchar(2)) as data20
     FROM 
-	    FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND 
+        FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND 
         DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)    
     
     group by
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
+        1
     """)
     d = {
         'contas_receber': [],
         'contas_pagar': [],
+        'data': [],
     }
+    i = 0
     for c in cur.fetchall():
-        d["contas_receber"].append(str(c[0])),
-        d["contas_pagar"].append(str(c[1])),
-        d["contas_receber"].append(str(c[2])),
-        d["contas_pagar"].append(str(c[3])),
-        d["contas_receber"].append(str(c[4])),
-        d["contas_pagar"].append(str(c[5])),
-        d["contas_receber"].append(str(c[6])),
-        d["contas_pagar"].append(str(c[7])),
-        d["contas_receber"].append(str(c[8])),
-        d["contas_pagar"].append(str(c[9])),
-        d["contas_receber"].append(str(c[10])),
-        d["contas_pagar"].append(str(c[11])),
-        d["contas_receber"].append(str(c[12])),
-        d["contas_pagar"].append(str(c[13])),
-        d["contas_receber"].append(str(c[14])),
-        d["contas_pagar"].append(str(c[15])),
-        d["contas_receber"].append(str(c[16])),
-        d["contas_pagar"].append(str(c[17])),
-        d["contas_receber"].append(str(c[18])),
-        d["contas_pagar"].append(str(c[19])),
-        d["contas_receber"].append(str(c[20])),
-        d["contas_pagar"].append(str(c[21])),
-        d["contas_receber"].append(str(c[22])),
-        d["contas_pagar"].append(str(c[23])),
-        d["contas_receber"].append(str(c[24])),
-        d["contas_pagar"].append(str(c[25])),
-        d["contas_receber"].append(str(c[26])),
-        d["contas_pagar"].append(str(c[27])),
-        d["contas_receber"].append(str(c[28])),
-        d["contas_pagar"].append(str(c[29])),
-        d["contas_receber"].append(str(c[30])),
-        d["contas_pagar"].append(str(c[31])),
-        d["contas_receber"].append(str(c[32])),
-        d["contas_pagar"].append(str(c[33])),
-        d["contas_receber"].append(str(c[34])),
-        d["contas_pagar"].append(str(c[35])),
-        d["contas_receber"].append(str(c[36])),
-        d["contas_pagar"].append(str(c[37])),
-        d["contas_receber"].append(str(c[38])),
-        d["contas_pagar"].append(str(c[39])),
-        d["contas_receber"].append(str(c[40])),
-        d["contas_pagar"].append(str(c[41])),
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
+        i = i + 1
+        d["contas_receber"].append(str(c[i])),
+        i = i + 1
+        d["contas_pagar"].append(str(c[i])),
+        i = i + 1
+        d["data"].append(str(c[i])),
 
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})

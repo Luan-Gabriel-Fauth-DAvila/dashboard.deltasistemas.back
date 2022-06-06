@@ -18,7 +18,7 @@
             <div id="banco_data">
                 <div id="banco_total">
                     <label>Total</label>
-                    <img src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <img src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '12vh' }" alt="">
                     <h6>[[ moneyFilter(saldoDisponivelEmContas_sum) ]]</h6>
                 </div>
                 <div id="banco" v-for="(c, index) in saldoDisponivelEmContas_var" :key="index">
@@ -28,7 +28,7 @@
                     <img v-else-if="c.banco === '33'" src="{% static 'public/bancos/santander.svg' %}" :style="{ width: '11vh' }" alt="">
                     <img v-else-if="c.banco === '748'" src="{% static 'public/bancos/sicredi.svg' %}" :style="{ width: '11vh' }" alt="">
                     <img v-else-if="c.banco === '756'" src="{% static 'public/bancos/sicoob.svg' %}" :style="{ width: '11vh' }" alt="">
-                    <img v-else src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '11vh' }" alt="">
+                    <img v-else src="{% static 'public/bancos/wallet.svg' %}" :style="{ width: '12vh' }" alt="">
                     <label>[[ moneyFilter(c.valor) ]]</label>
                 </div>
             </div>

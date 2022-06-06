@@ -23,12 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
 # CORS_ORIGIN_ALLOW_ALL = True
 
-ALLOWED_HOSTS = ['dashboard.deltasistemas.net',
-                '127.0.0.1',
-                '18.231.147.0']
+ALLOWED_HOSTS = [
+    'dashboard.deltasistemas.net',
+    '127.0.0.1',
+    '18.231.147.0'
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 SECURE_HSTS_SECONDS = True
 
@@ -70,13 +77,36 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'app',
-    # 'corsheaders',
-    # 'rest_framework',
+    "corsheaders",
+
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+}
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

@@ -27,6 +27,8 @@ const estoque = {
         async qtdCilindrosCheios () {
             const req = await fetch('/qtd_cilindros_cheios')
             const res = await req.json()
+
+            self.cilindros_cheios_value = res.qtd[0]
             
         },
 
@@ -34,7 +36,9 @@ const estoque = {
             const req = await fetch('/ticket_medio_de_compra')
             const res = await req.json()
             
-            self.ticket_medio_de_compra_value.innerHTML = this.moneyFilter(res[0].media_compras)
+            if (res[0].media_compras != 'None') {
+                self.ticket_medio_de_compra_value.innerHTML = this.moneyFilter(res[0].media_compras)
+            }
         },
 
         async valorDeTodosOsProdutos () {
