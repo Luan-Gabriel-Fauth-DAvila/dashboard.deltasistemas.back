@@ -38,6 +38,8 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://164.92.80.146:8000',
+    'https://dashboard.deltasistemas.net'
 ]
 
 SECURE_HSTS_SECONDS = True
