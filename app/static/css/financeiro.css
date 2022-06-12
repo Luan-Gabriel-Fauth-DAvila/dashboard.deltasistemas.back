@@ -1,3 +1,10 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 2vh;
+  font-family: 'Poppins', sans-serif;
+}
 small {
     line-height: 2.5vh;
     font-size: 1vh;
@@ -64,8 +71,9 @@ h6 {
 #painel {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
-    grid-template-rows: 30vh 15vh 35vh 40vh 40vh;
-    grid-template-areas:    "saldo_em_conta saldo_em_conta saldo_em_conta saldo_em_conta"
+    grid-template-rows: 30vh 15vh 60vh 40vh 50vh;
+    grid-template-areas:    /*"filter filter filter filter"*/
+                            "saldo_em_conta saldo_em_conta saldo_em_conta saldo_em_conta"
                             "cr_atrasado cr_vencer cp_atrasado cp_vencer"
                             "contas_a_receber contas_a_receber contas_a_pagar contas_a_pagar"
                             "recebimentos_por_forma recebimentos_por_forma emprestimos emprestimos"
@@ -77,8 +85,10 @@ h6 {
   #painel {
         display: grid;
         grid-template-columns: 50% 50%;
-        grid-template-rows: 30vh 15vh 15vh 35vh 35vh 40vh 40vh;
-        grid-template-areas:    "saldo_em_conta saldo_em_conta"
+        grid-template-rows: 30vh 15vh 15vh 60vh 60vh 40vh 50vh;
+        grid-template-areas:    /*"filter filter"
+                                "filter filter"*/
+                                "saldo_em_conta saldo_em_conta"
                                 "cr_atrasado cr_vencer"
                                 "cp_atrasado cp_vencer"
                                 "contas_a_receber contas_a_receber"
@@ -90,6 +100,43 @@ h6 {
         padding: 5% 0;
    
     }
+}
+#filter {
+    grid-area: filter;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;  
+    align-items: center;
+
+    background: linear-gradient(135deg, rgb(67, 24, 255), rgb(134, 140, 255));
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: .5vh;
+    color: #fff;
+    z-index: 0;
+}
+@media only screen and (max-width: 630px) {
+    #filter {
+        flex-direction: column;
+    }
+}
+#filter #data_ini,
+#filter #data_fim {
+    border: unset;
+    border-radius: 1vh;
+    padding: 1vh;
+}
+#buttom_filter {
+    border: unset;
+    padding: 1vh;
+    background-color: #fff;
+    color: #1B2559;
+    border-radius: .5vh;
+}
+#buttom_filter:hover {
+    box-shadow: 0 0 5px 0;
+    background-color: rgb(214, 214, 214);
 }
 #saldo_em_conta {
     grid-area: saldo_em_conta;
@@ -253,4 +300,11 @@ h6 {
     border-radius: 2vh;
     padding: 2vh 2vh;
     
+}
+#fluxo_de_caixa_info {
+    display: flex;
+    align-items: center;
+}
+#dias_fluxo_caixa {
+    margin-left: 2.5vh
 }

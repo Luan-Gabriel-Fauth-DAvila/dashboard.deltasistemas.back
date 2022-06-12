@@ -21,58 +21,62 @@ def conn():
     )
     return conn
 
-# def home(request):
-#     return redirect('/accounts/login/?next=/painel/comercial/')
-#     # return render(request, 'home.html')
+def home(request):
+    return redirect('/accounts/login/?next=/painel/comercial/')
+    # return render(request, 'home.html')
 
-# @csrf_exempt
-# def login(request):
-#     if request.method == "POST":
-#         username = request.POST["username"]
-#         password = request.POST["password"]
-#         usuario = auth.authenticate(request, username=username, password=password)
-#         if usuario is not None:
-#             auth.login(request, usuario)
-#             if request.POST['next']:
-#                 return redirect(request.POST['next'])
-#             else:
-#                 return redirect('/painel/comercial/')
-#         else:
-#             form_login = AuthenticationForm()
-#             return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.POST['next']})
-#     else:
-#         form_login = AuthenticationForm()
-#         return render(request, 'accounts/login.html', {'form_login': form_login, 'next': request.GET['next']})
+@csrf_exempt
+def login(request):
+    try:
+        next = request.POST['next']
+    except MultiValueDictKeyError:
+        next = ''
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        usuario = auth.authenticate(request, username=username, password=password)
+        if usuario is not None:
+            auth.login(request, usuario)
+            if next:
+                return redirect(next)
+            else:
+                return redirect('/painel/comercial/')
+        else:
+            form_login = AuthenticationForm()
+            return render(request, 'accounts/login.html', {'form_login': form_login, 'next': next})
+    else:
+        form_login = AuthenticationForm()
+        return render(request, 'accounts/login.html', {'form_login': form_login, 'next': next})
 
-# @csrf_exempt
-# @login_required
-# def cadastro(request):
-#     if request.method == "POST":
-#         form_usuario = UserCreationForm(request.POST)
-#         if form_usuario.is_valid():
-#             form_usuario.save()
-#             return redirect('/accounts/login/')
-#     else:
-#         form_usuario = UserCreationForm()
-#     return render(request, 'accounts/cadastro.html', {'form_usuario': form_usuario})
+@csrf_exempt
+@login_required
+def cadastro(request):
+    if request.method == "POST":
+        form_usuario = UserCreationForm(request.POST)
+        if form_usuario.is_valid():
+            form_usuario.save()
+            return redirect('/accounts/login/')
+    else:
+        form_usuario = UserCreationForm()
+    return render(request, 'accounts/cadastro.html', {'form_usuario': form_usuario})
 
-# @login_required
-# def comercial(request):
+@login_required
+def comercial(request):
     
     
-#     return render(request, 'app/comercial.html', {'page': 1})
+    return render(request, 'app/comercial.html', {'page': 1})
 
-# @login_required
-# def financeiro(request):
+@login_required
+def financeiro(request):
     
 
-#     return render(request, 'app/financeiro.html', {'page': 2})
+    return render(request, 'app/financeiro.html', {'page': 2})
 
-# @login_required
-# def estoque(request):
+@login_required
+def estoque(request):
     
 
-#     return render(request, 'app/estoque.html', {'page': 3})
+    return render(request, 'app/estoque.html', {'page': 3})
 
 
 
@@ -814,8 +818,7 @@ def total_lucro_bruto(request):
     WHERE
         V.IDN_CANCELADA = 'N' AND
         V.CODOPER IN (111,107,112,113) and
-        """ + data_filter)
-    print(data_filter)
+        """ + filters())
     d = {
         'valor_total': [],
         'acrescimo': [],
@@ -1218,94 +1221,40 @@ def rankingComprasPorFornecedor(request):
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
 def fluxo_de_caixa(request):
+    try:
+        if request.GET['dias'] == 'null' or request.GET['dias'] =='undefined.undefined.':
+            raise MultiValueDictKeyError
+        else:
+            dias = int(request.GET['dias'])
+            sql = """\n(SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE)),
+        (SELECT SUM(SALDO) AS TOTAL_PAGAR_HOJE FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)),
+        cast(extract (day from current_date) as varchar(2))|| '/' ||cast(extract (month from current_date) as varchar(2)) || '/' || cast(extract (year from current_date) as varchar(4)) as data0"""
+            i = 1
+            while i <= dias:
+                sql = sql + """,\n
+        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +"""+str(i)+""")),
+        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_01 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +"""+str(i)+""")),
+        cast(extract (day from current_date+"""+str(i)+""") as varchar(2))|| '/' ||cast(extract (month from current_date+"""+str(i)+""") as varchar(2)) || '/' || cast(extract (year from current_date+"""+str(i)+""") as varchar(4)) as data"""+str(i)
+                i = i + 1
+        
+    except MultiValueDictKeyError:
+        dias = 20
+        sql = """\n(SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE)),
+        (SELECT SUM(SALDO) AS TOTAL_PAGAR_HOJE FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)),
+        cast(extract (day from current_date) as varchar(2))|| '/' ||cast(extract (month from current_date) as varchar(2)) || '/' || cast(extract (year from current_date) as varchar(4)) as data0"""
+        i = 1
+        while i <= dias:
+            sql = sql + """,\n
+        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +"""+str(i)+""")),
+        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_01 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +"""+str(i)+""")),
+        cast(extract (day from current_date+"""+str(i)+""") as varchar(2))|| '/' ||cast(extract (month from current_date+"""+str(i)+""") as varchar(2)) || '/' || cast(extract (year from current_date+"""+str(i)+""") as varchar(4)) as data"""+str(i)
+            i = i + 1
+
     con = conn()
     cur = con.cursor()
     cur.execute(""" 
     SELECT
-        /* TOTAL A PAGAR E RECEBER  HOJE */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_HOJE FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)),
-        cast(extract (day from current_date) as varchar(2))|| '/' ||cast(extract (month from current_date) as varchar(2)) as data0,
-        /* TOTAL A PAGAR E RECEBER  DIA 01 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_01 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +1)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_01 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +1)),
-        cast(extract (day from current_date+1) as varchar(2))|| '/' ||cast(extract (month from current_date+1) as varchar(2)) as data1,
-        /* TOTAL A PAGAR E RECEBER  DIA 02 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_02 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +2)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_02 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +2)),
-        cast(extract (day from current_date+2) as varchar(2))|| '/' ||cast(extract (month from current_date+2) as varchar(2)) as data2,
-        /* TOTAL A PAGAR E RECEBER  DIA 03 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_03 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +3)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_03 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +3)),
-        cast(extract (day from current_date+3) as varchar(2))|| '/' ||cast(extract (month from current_date+3) as varchar(2)) as data3,
-        /* TOTAL A PAGAR E RECEBER  DIA 04 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_04 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +4)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_04 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +4)),
-        cast(extract (day from current_date+4) as varchar(2))|| '/' ||cast(extract (month from current_date+4) as varchar(2)) as data4,
-        /* TOTAL A PAGAR E RECEBER  DIA 05 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_05 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +5)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_05 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +5)),
-        cast(extract (day from current_date+5) as varchar(2))|| '/' ||cast(extract (month from current_date+5) as varchar(2)) as data5,
-        /* TOTAL A PAGAR E RECEBER  DIA 06 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_06 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +6)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_06 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +6)),
-        cast(extract (day from current_date+6) as varchar(2))|| '/' ||cast(extract (month from current_date+6) as varchar(2)) as data6,
-        /* TOTAL A PAGAR E RECEBER  DIA 07 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_07 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +7)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_07 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +7)),
-        cast(extract (day from current_date+7) as varchar(2))|| '/' ||cast(extract (month from current_date+7) as varchar(2)) as data7,
-        /* TOTAL A PAGAR E RECEBER  DIA 08 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_08 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +8)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_08 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +8)),
-        cast(extract (day from current_date+8) as varchar(2))|| '/' ||cast(extract (month from current_date+8) as varchar(2)) as data8,
-        /* TOTAL A PAGAR E RECEBER  DIA 09 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_09 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +9)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_09 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +9)),
-        cast(extract (day from current_date+9) as varchar(2))|| '/' ||cast(extract (month from current_date+9) as varchar(2)) as data9,
-        /* TOTAL A PAGAR E RECEBER  DIA 10 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_10 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +10)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_10 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +10)),
-        cast(extract (day from current_date+10) as varchar(2))|| '/' ||cast(extract (month from current_date+10) as varchar(2)) as data10,
-        /* TOTAL A PAGAR E RECEBER  DIA 11 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_11 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +11)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_11 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +11)),
-        cast(extract (day from current_date+11) as varchar(2))|| '/' ||cast(extract (month from current_date+11) as varchar(2)) as data11,
-        /* TOTAL A PAGAR E RECEBER  DIA 12 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_12 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +12)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_12 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +12)),
-        cast(extract (day from current_date+12) as varchar(2))|| '/' ||cast(extract (month from current_date+12) as varchar(2)) as data12,
-        /* TOTAL A PAGAR E RECEBER  DIA 13 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_13 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +13)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_13 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +13)),
-        cast(extract (day from current_date+13) as varchar(2))|| '/' ||cast(extract (month from current_date+13) as varchar(2)) as data13,
-        /* TOTAL A PAGAR E RECEBER  DIA 14 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_14 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +14)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_14 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +14)),
-        cast(extract (day from current_date+14) as varchar(2))|| '/' ||cast(extract (month from current_date+14) as varchar(2)) as data14,
-        /* TOTAL A PAGAR E RECEBER  DIA 15 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_15 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +15)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_15 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +15)),
-        cast(extract (day from current_date+15) as varchar(2))|| '/' ||cast(extract (month from current_date+15) as varchar(2)) as data15,
-        /* TOTAL A PAGAR E RECEBER  DIA 16 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_16 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +16)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_16 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +16)),
-        cast(extract (day from current_date+16) as varchar(2))|| '/' ||cast(extract (month from current_date+16) as varchar(2)) as data16,
-        /* TOTAL A PAGAR E RECEBER  DIA 17 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_17 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +17)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_17 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +17)),
-        cast(extract (day from current_date+17) as varchar(2))|| '/' ||cast(extract (month from current_date+17) as varchar(2)) as data17,
-        /* TOTAL A PAGAR E RECEBER  DIA 18 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_18 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +18)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_18 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +18)),
-        cast(extract (day from current_date+18) as varchar(2))|| '/' ||cast(extract (month from current_date+18) as varchar(2)) as data18,
-        /* TOTAL A PAGAR E RECEBER  DIA 19 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_19 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +19)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_19 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +19)),
-        cast(extract (day from current_date+19) as varchar(2))|| '/' ||cast(extract (month from current_date+19) as varchar(2)) as data19,
-        /* TOTAL A PAGAR E RECEBER  DIA 20 */
-        (SELECT SUM(SALDO) AS TOTAL_RECEBER_NO_DIA_20 FROM FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +20)),
-        (SELECT SUM(SALDO) AS TOTAL_PAGAR_NO_DIA_20 FROM FATURAS_PAGAR_PARCELAS WHERE SALDO > '0' AND DATA_VENCIMENTO = (CURRENT_DATE +20)),
-        cast(extract (day from current_date+20) as varchar(2))|| '/' ||cast(extract (month from current_date+20) as varchar(2)) as data20
+        """ + sql + """
     FROM 
         FATURAS_RECEBER_PARCELAS WHERE SALDO > '0' AND 
         DATA_VENCIMENTO BETWEEN (CURRENT_DATE) AND (CURRENT_DATE)    
@@ -1320,131 +1269,15 @@ def fluxo_de_caixa(request):
     }
     i = 0
     for c in cur.fetchall():
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
-        i = i + 1
-        d["contas_receber"].append(str(c[i])),
-        i = i + 1
-        d["contas_pagar"].append(str(c[i])),
-        i = i + 1
-        d["data"].append(str(c[i])),
+        i = 0
+        while i < len(c):
+            d["contas_receber"].append(float(c[i]) if c[i] != None else 0)
+            i = i + 1
+            # print(c[i])
+            d["contas_pagar"].append(float(c[i]) if c[i] != None else 0)
+            i = i + 1
+            d["data"].append(str(c[i]))
+            i = i + 1
 
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})

@@ -11,6 +11,17 @@
 {% block content %}
     {% include 'components/navbar.html' %}
     <section id="painel">
+        <div id="filter">
+            <div>
+                <label for="">Data Inicio</label>
+                <input type="date" id="data_ini">
+            </div>
+            <div>
+                <label for="">Data Fim</label>
+                <input type="date" id="data_fim">
+            </div>
+            <button @click="defData" id="buttom_filter">Aplicar</button>
+        </div>
         <div id="total_vendas">
             <div>
                 <label>total de vendas</label>
@@ -45,8 +56,8 @@
                 <h2>Vendas por Mês</h2>
                 <label>Total evolução <span class="material-icons-outlined" id="total_evolucao_arrow"></span><p id="total_evolucao"></p></label>
             </div>
-            <div :style="{ height: '28vh' }">
-                <canvas id="total_vendas_mensal_chart"></canvas>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="total_vendas_mensal_chart"></div>
             </div>
         </div>
         <div id="total_vendas_por_agrupamento">
@@ -79,30 +90,16 @@
             <div>
                 <h2>Ranking de Vendas Por vendedor<label style="font-weight: normal;">Por Mês</label></h2>
             </div>
-            <div>
-                <div id="container_principal" v-for="(r, index) in rankingvendedores_var" :key="index">
-                    <div id='barra_total'>
-                        <div id="barra_porcentagem" :style="{ backgroundColor: colors[index] ,width: tamanhoBarra(r.valor, rankingvendedores_sum) + '%' }">
-                            <b id="barra_valor">[[ moneyFilter(r.valor) ]]</b>
-                        </div>
-                    </div>
-                    <h6 id="barra_cliente">[[ r.nome ]]</h6>
-                </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="ranking_de_vendas_por_vendedor_chart"></div>
             </div>
         </div>
         <div id="ranking_de_vendas_por_cliente">
             <div>
                 <h2>Ranking de Vendas Por Cliente<label style="font-weight: normal;">Por Mês</label></h2>
             </div>
-            <div>
-                <div id="container_principal" v-for="(r, index) in rankingclientes_var" :key="index">
-                    <div id='barra_total'>
-                        <div id="barra_porcentagem" :style="{ backgroundColor: colors[index] ,width: tamanhoBarra(r.total_vendas, rankingclientes_sum) + '%' }">
-                            <b id="barra_valor">[[ moneyFilter(r.total_vendas) ]]</b>
-                        </div>
-                    </div>
-                    <h6 id="barra_cliente">[[ r.nome ]]</h6>
-                </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="ranking_de_vendas_por_cliente_chart"></div>
             </div>
         </div>
         <div id="ranking_produtos_mais_vendidos">

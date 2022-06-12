@@ -7,12 +7,12 @@ app_name = 'app'
 
 urlpatterns = [
     
-    # path('', views.home),
-    # path('accounts/login/', views.login),
-    # path('accounts/cadastro/', views.cadastro),
-    # path('painel/comercial/', views.comercial),
-    # path('painel/financeiro/', views.financeiro),
-    # path('painel/estoque/', views.estoque),
+    path('', views.home),
+    path('accounts/login/', views.login),
+    path('accounts/cadastro/', views.cadastro),
+    path('painel/comercial/', views.comercial),
+    path('painel/financeiro/', views.financeiro),
+    path('painel/estoque/', views.estoque),
 
 
     path('total_vendas/', views.total_vendas),                                                                                  ##utilizado

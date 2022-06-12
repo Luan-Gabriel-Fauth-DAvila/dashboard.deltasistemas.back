@@ -2,6 +2,7 @@ const financeiro = {
     delimiters: ['[[',']]'],
     data () {
         return {
+            hostBackEnd: 'http://127.0.0.1:8000',
             colors: [
                 '#c438ef',
                 '#05cd99',
@@ -31,7 +32,7 @@ const financeiro = {
         },
 
         async saldoDisponivelEmContas () {
-            const req = await fetch('/saldo_disponivel_em_contas')
+            const req = await fetch(this.hostBackEnd+'/saldo_disponivel_em_contas')
             const res = await req.json()
 
             this.saldoDisponivelEmContas_var = res
@@ -41,51 +42,66 @@ const financeiro = {
             }
             this.saldoDisponivelEmContas_sum = sum
         },
+        defData () {
+            const ini = self.data_ini.value.split('-', 3)
+            const fim = self.data_fim.value.split('-', 3)
+            window.location.href = ('http://localhost:3000/painel/financeiro/?data_ini='+ini[2]+'.'+ini[1]+'.'+ini[0]+'&data_fim='+fim[2]+'.'+fim[1]+'.'+fim[0])
+        },
+        defFilter () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const data_ini = urlParams.get('data_ini')
+            const data_fim = urlParams.get('data_fim')
+            const urlFilter = '?data_ini='+data_ini+'&data_fim='+data_fim
+            return urlFilter
+        },
 
         async contasReceberAtrasadas () {
-            const req = await fetch('/contas_a_receber_do_inicio_ate_a_data_atual')
+            const req = await fetch(this.hostBackEnd+'/contas_a_receber_do_inicio_ate_a_data_atual')
             const res = await req.json()
             
             self.cr_atrasado_value.innerHTML = this.moneyFilter(res.faturas_receber)
         },
 
         async contasReceberAVencer () {
-            const req = await fetch('/contas_a_receber_a_partir_da_data_atual')
+            const req = await fetch(this.hostBackEnd+'/contas_a_receber_a_partir_da_data_atual')
             const res = await req.json()
 
             self.cr_vencer_value.innerHTML = this.moneyFilter(res.faturas_receber)
         },
 
         async contasPagarAtrasadas () {
-            const req = await fetch('/contas_a_pagar_do_inicio_ate_a_data_atual')
+            const req = await fetch(this.hostBackEnd+'/contas_a_pagar_do_inicio_ate_a_data_atual')
             const res = await req.json()
             
             self.cp_atrasado_value.innerHTML = this.moneyFilter(res.faturas_pagar)
         },
 
         async contasPagarAVencer () {
-            const req = await fetch('/contas_a_pagar_a_partir_da_data_atual')
+            const req = await fetch(this.hostBackEnd+'/contas_a_pagar_a_partir_da_data_atual')
             const res = await req.json()
 
             self.cp_vencer_value.innerHTML = this.moneyFilter(res.faturas_pagar)
         },
 
         async contasReceber () {
-            const req = await fetch('/contas_a_receber_por_ranking_e_dia')
+            const req = await fetch(this.hostBackEnd+'/contas_a_receber_por_ranking_e_dia')
             const res = await req.json()
 
+            let parceiro = []
+            res.parceiro.forEach(function (e) {
+                parceiro.push(e.substr(0,10))
+            })
             const data = {
-                labels: res.nome,
-                datasets: [
-                    {
-                        data: res.saldo,
-                        borderColor: '#05CD99',
-                        backgroundColor: '#05CD99',
-                        borderWidth: 2,
-                        borderRadius: '5px',
-                        borderSkipped: false,
-                    },
-                ]
+                labels: parceiro,
+                datasets: [{
+                    data: res.saldo,
+                    label: 'Constas a Receber',
+                    borderColor: '#05CD99',
+                    backgroundColor: '#05CD99',
+                    borderWidth: 2,
+                    borderRadius: '5px',
+                    borderSkipped: false,
+                }]
             };
             const config = {
             type: 'bar',
@@ -108,7 +124,7 @@ const financeiro = {
                 chartStatus.data.datasets.data = res.total_vendas
                 chartStatus.update()
             }else {
-                const total_vendas_mensal = new Chart(
+                const contas_a_receber = new Chart(
                     document.getElementById('contas_a_receber_chart'),
                     config
                 );
@@ -116,21 +132,22 @@ const financeiro = {
         },
 
         async contasPagar () {
-            const req = await fetch('/contas_a_pagar_por_ranking_e_dia')
+            const req = await fetch(this.hostBackEnd+'/contas_a_pagar_por_ranking_e_dia')
             const res = await req.json()
 
             const data = {
                 labels: res.nome,
-                datasets: [
-                    {
-                        data: res.saldo,
-                        borderColor: '#FF869C',
-                        backgroundColor: '#FF869C',
-                        borderWidth: 2,
-                        borderRadius: '10px',
-                        borderSkipped: false,
-                    },
-                ]
+                datasets: [{
+                    data: res.saldo,
+                    label: 'Constas a Pagar',
+                    borderColor: '#FF869C',
+                    backgroundColor: '#FF869C',
+                    borderWidth: 2,
+                    maxBarThickness: 64,
+
+                    borderRadius: '10px',
+                    borderSkipped: false,
+                }]
             };
             const config = {
             type: 'bar',
@@ -161,7 +178,7 @@ const financeiro = {
         },
 
         async recebimentosPorForma () {
-            const req = await fetch('/total_de_recebimentos_por_forma_mensal/resumo_geral')
+            const req = await fetch(this.hostBackEnd+'/total_de_recebimentos_por_forma_mensal/resumo_geral')
             const res = await req.json()
 
             const formaRecebimentoTitle = [
@@ -215,7 +232,7 @@ const financeiro = {
         },
 
         async detalhesFinaciamentoEmprestimo () {
-            const req = await fetch('/detalhes_finaciamento')
+            const req = await fetch(this.hostBackEnd+'/detalhes_finaciamento')
             const res = await req.json()
             
             this.detalhesFinaciamentoEmprestimo_var = res
@@ -229,48 +246,50 @@ const financeiro = {
         },
 
         async fluxoDeCaixa () {
-            const req = await fetch('/fluxo_de_caixa')
+            const req = await fetch(this.hostBackEnd+'/fluxo_de_caixa/?dias='+document.getElementById('dias_fluxo_caixa').value)
             const res = await req.json()
 
-            const data = {
-                labels: ['hoje','+1','+2','+3','+4','+5','+6','+7','+8','+9','+10','+11','+12','+13','+14','+15','+16','+17','+18','+19','+20'],
-                datasets: [
-                    {
-                        label: 'Contas a Receber',
-                        data: res.contas_receber,
-                        tension: 0.3,
-                        borderColor: '#05CD99',
-                        backgroundColor: '#05CD99',
+            const total_vendas_mensal_chart = Highcharts.chart('fluxo_20_dias_chart', {
+                plotOptions: {
+                    series: {
+                        // general options for all series
                     },
-                    {
-                        label: 'Contas a Pagar',
-                        data: res.contas_pagar,
-                        tension: 0.3,
-                        borderColor: '#FF869C',
-                        backgroundColor: '#FF869C',
-                    }
-                ]
-            };
-            const config = {
-                type: 'line',
-                data: data,
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
+                    spline: {
+                    },
+                },
+                chart: {
+                    height: parseInt(window.screen.height)*0.32
+                },
+                title: {
+                    text: undefined,
+                },
+                xAxis: {
+                    categories: res.data,
+                },
+                yAxis: {
+                    title: {
+                        text: undefined,
                     }
                 },
-            };
-            const fluxo_20_dias_chart = new Chart(
-                document.getElementById('fluxo_20_dias_chart'),
-                config
-            );
+                series: [{
+                    type: 'spline',
+                    name: 'Contas a Pagar',
+                    data: res.contas_pagar,
+                    color: '#FF869C',
+                },{
+                    type: 'spline',
+                    name: 'Contas a Receber',
+                    data: res.contas_receber,
+                    color: '#05CD99',
+                }]
+            })
         }
     },
     mounted () {
+        document.getElementById('dias_fluxo_caixa').addEventListener("change", () => {
+            this.fluxoDeCaixa()
+        })
+
         this.saldoDisponivelEmContas()
         this.contasReceberAtrasadas()
         this.contasReceberAVencer()

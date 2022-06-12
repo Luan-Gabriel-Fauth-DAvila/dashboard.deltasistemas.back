@@ -1,3 +1,13 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 2vh;
+  font-family: 'Poppins', sans-serif;
+}
+html,body {
+  background-color: #eeeeee;
+}
 small {
     line-height: 2.5vh;
     font-size: 1vh;
@@ -36,8 +46,9 @@ h6 {
 #painel {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
-    grid-template-rows: 15vh 40vh 25vh 40vh 40vh;
-    grid-template-areas:    "total_vendas total_cmv total_lucro_bruto valor_em_locacao"
+    grid-template-rows: 15vh 15vh 45vh 25vh 40vh 40vh;
+    grid-template-areas:    "filter filter filter filter"
+                            "total_vendas total_cmv total_lucro_bruto valor_em_locacao"
                             "total_vendas_mensal total_vendas_mensal total_vendas_por_agrupamento total_vendas_por_agrupamento"
                             "meta_de_vendas meta_de_vendas ranking_de_vendas_por_vendedor ranking_de_vendas_por_vendedor"
                             "ranking_de_vendas_por_cliente ranking_de_vendas_por_cliente ranking_de_vendas_por_vendedor ranking_de_vendas_por_vendedor"
@@ -50,8 +61,10 @@ h6 {
   #painel {
         display: grid;
         grid-template-columns: 50% 50%;
-        grid-template-rows: 15vh 15vh 40vh 40vh 25vh 80vh 80vh 40vh;
-        grid-template-areas:    "total_vendas total_cmv" 
+        grid-template-rows: 15vh 15vh 15vh 15vh 40vh 40vh 25vh 80vh 80vh 40vh;
+        grid-template-areas:    "filter filter"
+                                "filter filter"
+                                "total_vendas total_cmv" 
                                 "total_lucro_bruto valor_em_locacao"
                                 "total_vendas_mensal total_vendas_mensal"
                                 "total_vendas_por_agrupamento total_vendas_por_agrupamento"
@@ -63,6 +76,43 @@ h6 {
         padding: 5% 0;
    
     }
+}
+#filter {
+    grid-area: filter;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;  
+    align-items: center;
+
+    background: linear-gradient(135deg, rgb(67, 24, 255), rgb(134, 140, 255));
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: .5vh;
+    color: #fff;
+    z-index: 0;
+}
+@media only screen and (max-width: 630px) {
+    #filter {
+        flex-direction: column;
+    }
+}
+#filter #data_ini,
+#filter #data_fim {
+    border: unset;
+    border-radius: 1vh;
+    padding: 1vh;
+}
+#buttom_filter {
+    border: unset;
+    padding: 1vh;
+    background-color: #fff;
+    color: #1B2559;
+    border-radius: .5vh;
+}
+#buttom_filter:hover {
+    box-shadow: 0 0 5px 0;
+    background-color: rgb(214, 214, 214);
 }
 #total_vendas {
     grid-area: total_vendas;
