@@ -2,7 +2,7 @@ const financeiro = {
     delimiters: ['[[',']]'],
     data () {
         return {
-            hostBackEnd: 'http://164.92.80.146:8000',
+            hostBackEnd: '',
             colors: [
                 '#c438ef',
                 '#05cd99',
