@@ -31,9 +31,9 @@ ALLOWED_HOSTS = [
     'dashboard.deltasistemas.net',
     '127.0.0.1',
     '18.231.147.0'
-    '192.168.100.3:3000',
-    'localhost',
+    '192.168.100.3',
     '164.92.80.146'
+    'localhost',
 ]
 
 CORS_ALLOWED_ORIGINS = [

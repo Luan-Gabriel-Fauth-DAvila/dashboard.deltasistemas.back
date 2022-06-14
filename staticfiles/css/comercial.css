@@ -1,0 +1,239 @@
+label {
+    margin: unset;
+    padding: unset;
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+
+    display: flex;
+    align-items: center;
+}
+label span {
+    line-height: 2.5vh;
+    font-size: 2vh;
+    color: rgb(0, 200, 0);
+}
+label p {
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+    color: rgb(0, 200, 0);
+}
+h4 {
+    line-height: 2.5vh;
+}
+h2 {
+    font-size: 3vh;
+    line-height: 2vh;
+}
+small {
+    line-height: 2.5vh;
+    font-size: 1vh;
+}
+h6 {
+    margin-left: 1vh;
+    font-size: 1.5vh;
+    font-weight: bold;
+}
+#painel {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: 15vh 40vh 25vh 40vh 40vh;
+    grid-template-areas:    "total_vendas total_cmv total_lucro_bruto valor_em_locacao"
+                            "total_vendas_mensal total_vendas_mensal total_vendas_por_agrupamento total_vendas_por_agrupamento"
+                            "meta_de_vendas meta_de_vendas ranking_de_vendas_por_vendedor ranking_de_vendas_por_vendedor"
+                            "ranking_de_vendas_por_cliente ranking_de_vendas_por_cliente ranking_de_vendas_por_vendedor ranking_de_vendas_por_vendedor"
+                            "ranking_de_vendas_por_cliente ranking_de_vendas_por_cliente ranking_produtos_mais_vendidos ranking_produtos_mais_vendidos";
+    margin: 5vh 10%;  
+    padding: 0 0; 
+    border-radius: 2vh;
+}
+@media only screen and (max-width: 630px) {
+  #painel {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 15vh 15vh 40vh 40vh 25vh 80vh 80vh 40vh;
+        grid-template-areas:    "total_vendas total_cmv" 
+                                "total_lucro_bruto valor_em_locacao"
+                                "total_vendas_mensal total_vendas_mensal"
+                                "total_vendas_por_agrupamento total_vendas_por_agrupamento"
+                                "meta_de_vendas meta_de_vendas"
+                                "ranking_de_vendas_por_vendedor ranking_de_vendas_por_vendedor"
+                                "ranking_de_vendas_por_cliente ranking_de_vendas_por_cliente"
+                                "ranking_produtos_mais_vendidos ranking_produtos_mais_vendidos";
+        margin: 0;  
+        padding: 5% 0;
+   
+    }
+}
+#total_vendas {
+    grid-area: total_vendas;
+
+    display: flex;
+    justify-content: space-evenly;  
+    align-items: center;
+
+    line-height: 5vh;
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: white;
+    background: linear-gradient(135deg, rgb(67, 24, 255), rgb(134, 140, 255));
+}
+#total_cmv {
+    grid-area: total_cmv;
+
+    display: flex;
+    justify-content: space-evenly;  
+    align-items: center;
+
+    line-height: 5vh;
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#total_lucro_bruto {
+    grid-area: total_lucro_bruto;
+
+    display: flex;
+    justify-content: space-evenly;  
+    align-items: center;
+
+    line-height: 5vh;
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#valor_em_locacao {
+    grid-area: valor_em_locacao;
+
+    display: flex;
+    justify-content: space-evenly;  
+    align-items: center;
+
+    line-height: 5vh;
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#total_vendas_mensal {
+    grid-area: total_vendas_mensal;
+
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#total_vendas_por_agrupamento {
+    grid-area: total_vendas_por_agrupamento;
+    
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#meta_de_vendas {
+    grid-area: meta_de_vendas;
+    
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#ranking_de_vendas_por_vendedor {
+    grid-area: ranking_de_vendas_por_vendedor;
+    
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#ranking_de_vendas_por_cliente {
+    grid-area: ranking_de_vendas_por_cliente;
+    
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+#ranking_produtos_mais_vendidos {
+    grid-area: ranking_produtos_mais_vendidos;
+    
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: 1vh;
+    color: #1B2559;
+    background: white;
+}
+
+
+
+
+
+
+
+
+#container_principal {
+    width: 90%;
+    height: 9vh;
+    margin: 0 auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#barra_total {
+    background-color: rgba(233, 237, 247, 1);
+    width: 70%;
+    height: 4vh;
+    border-radius: 4vh;
+}
+#barra_porcentagem {
+    background-color: rgba(196, 56, 239, 1);
+    height: 4vh;
+    border-radius: 4vh;
+}
+#barra_valor {
+    margin-left: 2.5vh !important;
+    font-size: 1.5vh;
+    display: unset !important;
+}
+#barra_cliente {
+    width: 30%;
+}
+#meta_de_vendas #container_principal {
+    justify-content: center;
+    align-items: flex-end;
+    flex-direction: column;
+    height: 10vh;
+}
+#meta_de_vendas #barra_cliente  {
+    width: 100%;
+    text-align: right;
+    font-weight: normal;
+}
+#barra_meta_vendas {
+    background-color: rgba(233, 237, 247, 1);
+    width: 100%;
+    height: 8vh;
+    border-radius: 2vh;
+}
+#barra_meta_vendas #barra_porcentagem {
+    height: 8vh; 
+    display: flex;
+    border-radius: 2vh;
+    align-items: center;
+}
+#barra_meta_vendas #barra_valor {
+    color: rgba(233, 237, 247, 1);
+    text-align: right; 
+}

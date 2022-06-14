@@ -1,0 +1,136 @@
+h4 {
+    line-height: 2.5vh;
+    font-size: 2.5vh;
+    font-weight: bold;
+}
+h5 {
+    line-height: 2.5vh;
+    font-size: 2vh;
+    font-weight: bold;
+}
+label {
+    line-height: 2.5vh;
+    font-size: 1.5vh;
+}
+small {
+    line-height: 2.5vh;
+    font-size: 1.5vh;
+    font-weight: normal !important;
+}
+
+#painel {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: 20vh 80vh 50vh;
+    grid-template-areas:    "prod_em_estoque cilindros_cheios ticket_medio_de_compra vlr_prod_em_estoque"
+                            "mapa_locacao mapa_locacao mapa_locacao mapa_locacao "
+                            "ranking_compra_por_forn ranking_compra_por_forn prod_mais_comprados prod_mais_comprados";
+    margin: 0 10%;  
+    padding: 5% 0; 
+}
+@media only screen and (max-width: 630px) {
+  #painel {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 20vh 20vh 80vh 50vh 50vh;
+    grid-template-areas:    "prod_em_estoque cilindros_cheios"
+                            "ticket_medio_de_compra vlr_prod_em_estoque"
+                            "mapa_locacao mapa_locacao"
+                            "ranking_compra_por_forn ranking_compra_por_forn"
+                            "prod_mais_comprados prod_mais_comprados";
+        margin: 0;  
+        padding: 5% 0;
+   
+    }
+}
+#prod_em_estoque {
+    grid-area: prod_em_estoque;
+    color: #e5e5e5;
+    background: linear-gradient(135deg, #05CD99 0%, #05CD55 100%);
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    padding-bottom: 4vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#cilindros_cheios {
+    grid-area: cilindros_cheios;
+    color: #e5e5e5;
+    background: #6452FF;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    padding-bottom: 4vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#ticket_medio_de_compra {
+    grid-area: ticket_medio_de_compra;
+    color: #e5e5e5;
+    background: #C438EF;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    padding-bottom: 4vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#vlr_prod_em_estoque {
+    grid-area: vlr_prod_em_estoque;
+    color: #e5e5e5;
+    background: #868CFF;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    padding-bottom: 4vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#mapa_locacao {
+    grid-area: mapa_locacao;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+}
+#mapa-img {
+    width: 90%;
+    height: 90%;
+    border-radius: 2vh;
+    margin: auto auto;
+    background-size: contain;
+    background-position: center;
+}
+#mapa-title {
+    margin-bottom: 2vh;
+}
+#ranking_compra_por_forn {
+    grid-area: ranking_compra_por_forn;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+}
+#prod_mais_comprados {
+    grid-area: prod_mais_comprados;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+}
