@@ -173,14 +173,16 @@ def total_vendas_mensal(request):
         if request.GET['data_ini'] == 'null' or request.GET['data_fim'] == 'null' or request.GET['data_ini'] == 'undefined.undefined.' or request.GET['data_fim'] == 'undefined.undefined.':
             raise MultiValueDictKeyError
         else:
+            qtd = ''
             data_filter = "dtacomp between '" + request.GET['data_ini'] + "' and '" + request.GET['data_fim'] + "'"
     except MultiValueDictKeyError:
+        qtd = 'first 12'
         data_filter = 'extract(year from dtacomp) = extract(year from current_date)'
 
     con = conn()
     cur = con.cursor()
     cur.execute("""
-    SELECT first 12
+    SELECT """ + qtd + """
         count (Venda_ID) qtd_vendas,
         sum (QTD) qtd_itens,
         sum(total_venda) total_vendas,

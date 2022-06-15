@@ -82,11 +82,10 @@ h6 {
 
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;  
+    justify-content: space-evenly;  
     align-items: center;
 
     background: linear-gradient(135deg, rgb(67, 24, 255), rgb(134, 140, 255));
-    padding: 2vh 2vh;
     margin: 2vh;
     border-radius: .5vh;
     color: #fff;
@@ -95,10 +94,12 @@ h6 {
 @media only screen and (max-width: 630px) {
     #filter {
         flex-direction: column;
+        justify-content: space-around;
     }
 }
 #filter #data_ini,
-#filter #data_fim {
+#filter #data_fim,
+#filter #agrupamento {
     border: unset;
     border-radius: 1vh;
     padding: 1vh;

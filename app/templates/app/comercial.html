@@ -20,7 +20,17 @@
                 <label for="">Data Fim</label>
                 <input type="date" id="data_fim">
             </div>
-            <button @click="defData" id="buttom_filter">Aplicar</button>
+            <div>
+                <label for="">Agrupamento</label>
+                <select type="select" id="agrupamento">
+                    <option value="gases">Gases</option>
+                    <option value="gases">Gases</option>
+                    <option value="gases">Gases</option>
+                </select>
+            </div>
+            <div>
+                <button @click="defData" id="buttom_filter">Aplicar</button>
+            </div>
         </div>
         <div id="total_vendas">
             <div>
@@ -46,7 +56,7 @@
         <div id="valor_em_locacao">
             <span class="material-icons-outlined">payments</span>
             <div>
-                <label>Valor em locação <small>(mensal)</small></label>
+                <label>Valor em locação</label>
                 <h4>Sem dados</h4>
             </div>
         </div>
@@ -71,7 +81,7 @@
         </div>
         <div id="meta_de_vendas">
             <div>
-                <h2>Meta de Vendas</h2><label>Por Mês</label>
+                <h2>Meta de Vendas</h2>
             </div>
             <div>   
                 <div id="container_principal">
@@ -88,7 +98,7 @@
         </div>
         <div id="ranking_de_vendas_por_vendedor">
             <div>
-                <h2>Ranking de Vendas Por vendedor<label style="font-weight: normal;">Por Mês</label></h2>
+                <h2>Ranking de Vendas Por vendedor</h2>
             </div>
             <div :style="{ maxHeight: '28vh' }">
                 <div id="ranking_de_vendas_por_vendedor_chart"></div>
@@ -96,7 +106,7 @@
         </div>
         <div id="ranking_de_vendas_por_cliente">
             <div>
-                <h2>Ranking de Vendas Por Cliente<label style="font-weight: normal;">Por Mês</label></h2>
+                <h2>Ranking de Vendas Por Cliente</h2>
             </div>
             <div :style="{ maxHeight: '28vh' }">
                 <div id="ranking_de_vendas_por_cliente_chart"></div>
