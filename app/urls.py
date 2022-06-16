@@ -24,6 +24,7 @@ urlpatterns = [
     path('total_lucro_bruto/', views.total_lucro_bruto),
     path('total_cmv/', views.total_cmv),                                                                                        ##utilizado
     path('total_cmv_mensal/', views.total_cmv_mensal),
+    path('agrupamentos/', views.agrupamentos),                                                                                  ##utilizado
     path('vendas_por_agrupamento_mensal/', views.vendas_por_agrupamento_mensal),                                                ##utilizado
     path('ranking_de_vendas_por_cliente/', views.ranking_de_vendas_por_cliente),                                                ##utilizado
     path('ranking_de_vendas_por_produto/', views.ranking_de_vendas_por_produto),                                                ##utilizado

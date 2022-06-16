@@ -22,8 +22,8 @@
             </div>
             <div>
                 <label for="">Agrupamento</label>
-                <select type="select" id="agrupamento">
-                    <option v-for="agr in agrupamento" :value="agr[0]">[[ agr[1] ]]</option>
+                <select id="agrupamento">
+                    <option v-for="agr in agrupamentos" :key="agr.codagrupamento" :value="agr.codagrupamento">[[ agr.dscagrupamento ]]</option>
                 </select>
             </div>
             <div>

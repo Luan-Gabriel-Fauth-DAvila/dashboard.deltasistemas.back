@@ -1313,6 +1313,26 @@ def ticket_medio_de_compra(request):
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
+def agrupamentos(request):
+    con = conn()
+    cur = con.cursor()
+    cur.execute("""
+    select
+        agr.codgrupo,
+        agr.dscgrupo
+
+    from agrupamentos agr
+        """)
+    d = []
+    for c in cur.fetchall():
+        d.append({
+            'codagrupamento': int(c[0]),
+            'dscagrupamento': str(c[1])
+        })
+
+    con.close()
+    return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
+
 def sql(request):
     con = conn()
     cur = con.cursor()

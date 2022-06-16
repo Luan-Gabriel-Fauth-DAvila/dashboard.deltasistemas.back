@@ -23,7 +23,7 @@ const comercial ={
             metadevendas_total: null,
             metadevendas_atual: null,
             heightDefined: 0,
-            agrupamentos: [],
+            agrupamentos: null,
 
             class_nav: 'deactive',
             url: ''
@@ -67,14 +67,22 @@ const comercial ={
         defData () {
             const ini = self.data_ini.value.split('-', 3)
             const fim = self.data_fim.value.split('-', 3)
-            window.location.href = (this.hostFront+'/painel/comercial/?data_ini='+ini[2]+'.'+ini[1]+'.'+ini[0]+'&data_fim='+fim[2]+'.'+fim[1]+'.'+fim[0])
+            const agrupamento = self.agrupamento.value
+            window.location.href = (this.hostFront+'/painel/comercial/?data_ini='+ini[2]+'.'+ini[1]+'.'+ini[0]+'&data_fim='+fim[2]+'.'+fim[1]+'.'+fim[0]+'&agrupamento='+agrupamento)
         },
         defFilter () {
             const urlParams = new URLSearchParams(window.location.search);
             const data_ini = urlParams.get('data_ini')
             const data_fim = urlParams.get('data_fim')
-            const urlFilter = '?data_ini='+data_ini+'&data_fim='+data_fim
+            const agrupamento = urlParams.get('agrupamento')
+            const urlFilter = '?data_ini='+data_ini+'&data_fim='+data_fim+'&agrupamento='+agrupamento
             return urlFilter
+        },
+        async getAgrupamentos () {
+            const req = await fetch(this.hostBack+'/agrupamentos/')
+            const res = await req.json()
+            
+            this.agrupamentos = res
         },
         navBar () {
             if (this.class_nav == 'deactive') {
@@ -166,10 +174,6 @@ const comercial ={
             const req = await fetch(this.hostBack+'/vendas_por_agrupamento_mensal/'+this.defFilter())
             const res = await req.json()
             
-            this.agrupamento = []
-            for (let i = 0; i < res.codagrupamento.length; i++) {
-                this.agrupamento.push([res.codagrupamento[i], res.dscagrupamento[i]])
-            }
             const data = {
                 labels: res.dscagrupamento,
                 datasets: [{
@@ -333,6 +337,7 @@ const comercial ={
         
     },
     mounted () {
+        this.getAgrupamentos()
         this.heightDefine()
         setInterval(() => {
             this.heightDefine()
