@@ -23,9 +23,7 @@
             <div>
                 <label for="">Agrupamento</label>
                 <select type="select" id="agrupamento">
-                    <option value="gases">Gases</option>
-                    <option value="gases">Gases</option>
-                    <option value="gases">Gases</option>
+                    <option v-for="agr in agrupamento" :value="agr[0]">[[ agr[1] ]]</option>
                 </select>
             </div>
             <div>

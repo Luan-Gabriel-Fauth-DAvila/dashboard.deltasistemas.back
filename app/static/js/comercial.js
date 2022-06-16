@@ -23,6 +23,7 @@ const comercial ={
             metadevendas_total: null,
             metadevendas_atual: null,
             heightDefined: 0,
+            agrupamentos: [],
 
             class_nav: 'deactive',
             url: ''
@@ -164,7 +165,11 @@ const comercial ={
         async valorVendasPorAgrupamento () {
             const req = await fetch(this.hostBack+'/vendas_por_agrupamento_mensal/'+this.defFilter())
             const res = await req.json()
-        
+            
+            this.agrupamento = []
+            for (let i = 0; i < res.codagrupamento.length; i++) {
+                this.agrupamento.push([res.codagrupamento[i], res.dscagrupamento[i]])
+            }
             const data = {
                 labels: res.dscagrupamento,
                 datasets: [{

@@ -853,6 +853,7 @@ def vendas_por_agrupamento_mensal(request):
     cur.execute("""
     select
         sum(vi.total_venda) as total_vendas,
+        ag.codgrupo,
         ag.dscagrupamento
 
     from vendas_itens vi
@@ -864,16 +865,18 @@ def vendas_por_agrupamento_mensal(request):
         """ + data_filter + """ and
         item_devolucao is null
 
-    group by 2
+    group by 2,3
     order by 1 
         """)
     d = {
         'total_vendas': [],
+        'codagrupamento': [],
         'dscagrupamento': []
     }
     for c in cur.fetchall():
         d['total_vendas'].append(float(c[0]))
-        d['dscagrupamento'].append(str(c[1]))
+        d['codagrupamento'].append(str(c[1]))
+        d['dscagrupamento'].append(str(c[2]))
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
