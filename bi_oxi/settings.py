@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
@@ -39,7 +39,9 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://164.92.80.146:8000',
-    'https://dashboard.deltasistemas.net'
+    'https://dashboard.deltasistemas.net',
+    'http://localhost',
+    'http://192.168.100.3'
 ]
 
 SECURE_HSTS_SECONDS = True
