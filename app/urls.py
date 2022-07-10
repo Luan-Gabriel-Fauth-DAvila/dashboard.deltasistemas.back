@@ -8,11 +8,11 @@ app_name = 'app'
 urlpatterns = [
     
     path('', views.home),
-    path('accounts/login/', views.login),
-    path('accounts/cadastro/', views.cadastro),
-    path('painel/comercial/', views.comercial),
-    path('painel/financeiro/', views.financeiro),
-    path('painel/estoque/', views.estoque),
+    # path('accounts/login/', views.login),
+    # path('accounts/cadastro/', views.cadastro),
+    # path('painel/comercial/', views.comercial),
+    # path('painel/financeiro/', views.financeiro),
+    # path('painel/estoque/', views.estoque),
 
 
     path('total_vendas/', views.total_vendas),                                                                                  ##utilizado
@@ -50,4 +50,7 @@ urlpatterns = [
     path('ranking_compras_por_fornecedor/', views.rankingComprasPorFornecedor),                                                 ##utilizado
     path('ranking_produto_mais_comprado/', views.ranking_produto_mais_comprado),                                                ##utilizado                                              
     path('total_de_valores_de_todos_os_produtos/', views.total_de_valores_de_todos_os_produtos),
+    
+
+    path('notas_nao_emitidas/', views.notas_nao_emitidas),
 ]

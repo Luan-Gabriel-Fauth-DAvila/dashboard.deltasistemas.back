@@ -973,8 +973,7 @@ def contas_a_pagar_por_ranking_e_dia(request):
         FP.DOCTO,
         FP.DESPESA_PRINCIPAL,
         DP.DSCDESPESA,
-        PC.PARCEIRO,
-        PC.NOME,
+        PC.PARCEIRO || '-' || PC.NOME as PARCEIRO,
         FPP.PARCELA,
         FPP.DATA_VENCIMENTO,
         FPP.SALDO,
@@ -1009,7 +1008,6 @@ def contas_a_pagar_por_ranking_e_dia(request):
         'despesa_principal': [],
         'dscdespesa': [],
         'parceiro': [],
-        'nome': [],
         'parcela': [],
         'data_vencimento': [],
         'saldo': [],
@@ -1021,11 +1019,10 @@ def contas_a_pagar_por_ranking_e_dia(request):
         d['despesa_principal'].append(str(c[2]))
         d['dscdespesa'].append(str(c[3]))
         d['parceiro'].append(str(c[4]))
-        d['nome'].append(str(c[5]))
-        d['parcela'].append(str(c[6]))
-        d['data_vencimento'].append(str(c[7]))
-        d['saldo'].append(str(c[8]))
-        d['historico'].append(str(c[9]))
+        d['parcela'].append(str(c[5]))
+        d['data_vencimento'].append(str(c[6]))
+        d['saldo'].append(str(c[7]))
+        d['historico'].append(str(c[8]))
 
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
@@ -1328,6 +1325,45 @@ def agrupamentos(request):
         d.append({
             'codagrupamento': int(c[0]),
             'dscagrupamento': str(c[1])
+        })
+
+    con.close()
+    return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
+
+def notas_nao_emitidas(request):
+    con = conn()
+    cur = con.cursor()
+    cur.execute("""
+        select
+            ne.codfilial,
+            f.cgc,
+            ne.num_nota,
+            max(nev.dhevento) as dhevento,
+            (select cod_retorno from notas_emitidas_eventos where nota_id=ne.nota_id and dhevento=max(nev.dhevento)) as codretorno,
+            (select retorno from notas_emitidas_eventos where nota_id=ne.nota_id and dhevento=max(nev.dhevento)) as retorno
+
+        from notas_emitidas ne
+            inner join notas_emitidas_eventos nev on (ne.nota_id = nev.nota_id)
+            inner join filiais f on (f.codfilial = ne.codfilial)
+
+        where
+            ne.nfe_cstat not in (100,101)
+
+        group by  
+            ne.codfilial, 
+            f.cgc,
+            ne.num_nota,
+            ne.nota_id
+        """)
+    d = []
+    for c in cur.fetchall():
+        d.append({
+            'codfilial': str(c[0]),
+            'cnpj': str(c[1]),
+            'num_nota': str(c[2]),
+            'dhevento': str(c[3]),
+            'codretorno': str(c[4]),
+            'retorno': str(c[5]),
         })
 
     con.close()

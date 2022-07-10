@@ -33,15 +33,18 @@ ALLOWED_HOSTS = [
     '188.166.65.228',
     '127.0.0.1',
     '192.168.100.3',
+    '192.168.100.128',
     'localhost',
+    '192.168.0.165'
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
     'http://164.92.80.146:8000',
     'https://dashboard.deltasistemas.net',
-    'http://localhost',
-    'http://192.168.100.3'
+    'http://192.168.100.128:3000',
+    'http://192.168.100.3:3000'
 ]
 
 SECURE_HSTS_SECONDS = True
@@ -86,29 +89,29 @@ INSTALLED_APPS = [
     'app',
     "corsheaders",
 
-    # 'rest_framework',
-    # 'rest_framework.authtoken',
-    # 'djoser',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.TokenAuthentication',
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ),
+}
 
-# SIMPLE_JWT = {
-#    'AUTH_HEADER_TYPES': ('JWT',),
-# }
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+}
 
-# DJOSER = {
-#     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-#     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-#     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-#     'SEND_ACTIVATION_EMAIL': True,
-#     'SERIALIZERS': {},
-# }
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
