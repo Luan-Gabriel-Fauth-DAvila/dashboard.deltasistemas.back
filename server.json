@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "bi-oxipora",
+        "name": "bi-oxipora-back",
         "script": "manage.py",
         "args": ["runserver", "0.0.0.0:8000","--insecure"],
         "exec_mode": "fork",
