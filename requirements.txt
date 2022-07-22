@@ -10,9 +10,13 @@ dj-database-url==0.5.0
 Django==4.0.4
 django-cors-headers==3.12.0
 django-templated-mail==1.1.1
-djangorestframework-simplejwt==5.2.0
+djangorestframework==3.13.1
+djangorestframework-simplejwt==4.8.0
+djoser==2.1.0
 fdb==2.0.2
 future==0.18.2
+geographiclib==1.52
+geopy==2.2.0
 heroku==0.1.4
 idna==3.3
 itypes==1.2.0

@@ -53,4 +53,5 @@ urlpatterns = [
     
 
     path('notas_nao_emitidas/', views.notas_nao_emitidas),
+    path('certificado_digital/', views.certificado_digital),
 ]

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '192.168.100.3',
     '192.168.100.128',
+    '192.168.15.166'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -44,6 +45,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://192.168.100.3:3000',
     'http://192.168.100.128:3000',
+    'http://192.168.15.166:3000',
 ]
 
 SECURE_HSTS_SECONDS = True

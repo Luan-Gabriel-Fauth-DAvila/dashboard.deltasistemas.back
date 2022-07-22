@@ -60,26 +60,30 @@ def cadastro(request):
         form_usuario = UserCreationForm()
     return render(request, 'accounts/cadastro.html', {'form_usuario': form_usuario})
 
-@login_required
-def comercial(request):
+# @login_required
+# def comercial(request):
     
     
-    return render(request, 'app/comercial.html', {'page': 1})
+#     return render(request, 'app/comercial.html', {'page': 1})
 
-@login_required
-def financeiro(request):
+# @login_required
+# def financeiro(request):
     
 
-    return render(request, 'app/financeiro.html', {'page': 2})
+#     return render(request, 'app/financeiro.html', {'page': 2})
 
-@login_required
-def estoque(request):
+# @login_required
+# def estoque(request):
     
 
-    return render(request, 'app/estoque.html', {'page': 3})
+#     return render(request, 'app/estoque.html', {'page': 3})
 
 
 
+def map_points(request):
+    pointer = []
+    
+    return pointer
 
 def filters(request):
     try:
@@ -1364,6 +1368,25 @@ def notas_nao_emitidas(request):
             'dhevento': str(c[3]),
             'codretorno': str(c[4]),
             'retorno': str(c[5]),
+        })
+
+    con.close()
+    return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
+
+def certificado_digital(request):
+    con = conn()
+    cur = con.cursor()
+    cur.execute("""
+    select
+        codfilial,
+        vencimento_certificado_digital
+    from filiais
+        """)
+    d = []
+    for c in cur.fetchall():
+        d.append({
+            'codfilial': str(c[0]),
+            'vencimento': str(c[1]),
         })
 
     con.close()
