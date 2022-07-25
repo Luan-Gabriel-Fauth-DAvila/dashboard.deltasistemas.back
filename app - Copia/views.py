@@ -523,46 +523,11 @@ def meta_de_vendas(request):
     con.close()
     return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
 
-def condicionais_abertas(request):
-    con = conn()
-    cur = con.cursor()
-    cur.execute("""
-    select first 6
-        c.numcondicional,
-        COALESCE(P.ENDERECO,'') as rua,
-        COALESCE(P.MUNICIPIO,'') as cidade,
-        'BRASIL' as pais
-
-    from condicionais c
-        inner join parceiros p on (p.parceiro = c.parceiro)
-
-    where
-        c.qtd_saldo > 0
-
-    group by
-        c.numcondicional,
-        rua,
-        cidade,
-        pais
-    """)
-    d = []
-
-    for c in cur.fetchall():
-        geo = geopy.Geopy().request(street=str(c[1]), city=str(c[2]), country=str(c[3]))
-
-        d.append({
-            'numcondicional': str(c[0]),
-            'lat': str(geo['lat']),
-            'lon': str(geo['lon']),
-        })
-    con.close()
-    return HttpResponse(json.dumps(d), status=200, headers={'content-type': 'application/json'})
-
 def mapa_de_locacoes(request):
     con = conn()
     cur = con.cursor()
     cur.execute("""
-    SELECT first 8
+    SELECT first 5
         C.NUMCONDICIONAL,
         P.PARCEIRO,
         P.NOME,
@@ -584,6 +549,11 @@ def mapa_de_locacoes(request):
     """)
     d = []
     for c in cur.fetchall():
+        geo = geopy.Geopy().request(street=str(c[3]), city=str(c[4]), country=str(c[5]))
+
+        print(geo['lat'],geo['lon'])
+        print(str(c[3]),str(c[4]),str(c[5]))
+
         d.append({
             'numcondicional': str(c[0]),
             'parceiro': str(c[1]),
@@ -591,6 +561,8 @@ def mapa_de_locacoes(request):
             'rua': str(c[3]),
             'cidade': str(c[4]),
             'pais': str(c[5]),
+            'lat': str(geo['lat']),
+            'lon': str(geo['lon']),
             'codproduto': str(c[6]),
             'dscproduto': str(c[7]),
             'codproduto_clas': str(c[8]),

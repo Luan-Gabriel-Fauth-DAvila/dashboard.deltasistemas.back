@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section id="login">
+
+    <section id="login_info">
+        <img src="{% static 'public/login/image.png' %}" alt="image" id="image">
+        <img src="{% static 'public/login/title.png' %}" alt="title" id="title">
+    </section>
+
+    <section id="login_screen">
+        <img src="{% static 'public/delta-logo.png' %}" alt="logo" id="delta_logo">
+        <form action="/accounts/login/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{next}}">
+            <div class="input-field">
+                <p for="username">Email ou Usuário</p>
+                {{form_login.username.errors}}
+                <input type="text" id="username" name="username" placeholder=" seuemail@email.com" v-model="username">
+            </div>
+            <div class="input-field">
+                <p for="password">Senha</p>
+                <input type="password" name="password" autocomplete='false' v-model="password">
+            </div>
+            <div class="checkbox-field">
+                <input type="checkbox" id="checkbox" v-model="remember">
+                <label for="checkbox">Lembrar-me</label>
+            </div>
+            <input type="submit" id="submit">
+        </form>
+    </section>
+
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

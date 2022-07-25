@@ -1,0 +1,61 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+
+<section id="navbar">
+    <div id="nav-desktop">
+      <div id="nav-left">
+        <div id="image">
+            <img src="{% static 'public/logo-oxi.png' %}" alt="logo" id="image_logo">
+        </div>
+        <div id="menu">
+            {% if page == 1 %}
+                <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link">Comercial</a><div id="down-bar"></div></div>
+                <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link" style="color:#D0D1D2;">Financeiro</a></div>
+                <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link" style="color:#D0D1D2;">Estoque</a></div>
+                {% elif  page == 2 %}
+                <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link" style="color:#D0D1D2;">Comercial</a></div>
+                <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link">Financeiro</a><div id="down-bar"></div></div>
+                <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link" style="color:#D0D1D2;">Estoque</a></div>
+                {% else %}
+                <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link" style="color:#D0D1D2;">Comercial</a></div>
+                <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link" style="color:#D0D1D2;">Financeiro</a></div>
+                <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link">Estoque</a><div id="down-bar"></div></div>
+            {% endif %}
+        </div>
+      </div>
+      <div id="perfil">
+          <label>{{ user.username }}</label>
+          <img src="{% static 'public/perfil_default.png' %}" alt="" id="menu_perfil">
+      </div>
+    </div>
+
+
+    <!-- NAV-MOBILE -->
+
+
+    <div id="nav-mobile">
+      <div id="menu-d">
+        <div id="menu-drop">
+          <button type="button" id="drop"><span class="material-icons-outlined">menu</span></button>
+          <div id="drop-content">
+            {% if page == 1 %}
+            <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link">Comercial</a></div>
+            <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link" style="color:#D0D1D2;">Financeiro</a></div>
+            <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link" style="color:#D0D1D2;">Estoque</a></div>
+            {% elif  page == 2 %}
+            <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link" style="color:#D0D1D2;">Comercial</a></div>
+            <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link">Financeiro</a></div>
+            <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link" style="color:#D0D1D2;">Estoque</a></div>
+            {% else %}
+            <div id="div-menu_link"><a href="/painel/comercial/" id="menu_link" style="color:#D0D1D2;">Comercial</a></div>
+            <div id="div-menu_link"><a href="/painel/financeiro/" id="menu_link" style="color:#D0D1D2;">Financeiro</a></div>
+            <div id="div-menu_link"><a href="/painel/estoque/" id="menu_link">Estoque</a></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div id="image">
+          <img src="{% static 'public/logo-oxi.png' %}" alt="logo" id="image_logo">
+      </div>
+    </div>
+</section>

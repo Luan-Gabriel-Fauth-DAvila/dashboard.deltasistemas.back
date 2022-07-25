@@ -43,7 +43,6 @@ urlpatterns = [
 
     
     path('mapa_de_locacoes/', views.mapa_de_locacoes),
-    path('condicionais_abertas/', views.condicionais_abertas),
     path('cilindros_em_condicionais/', views.cilindros_em_condicionais),
     path('ticket_medio_de_compra/', views.ticket_medio_de_compra),                                                              ##utilizado                                                 
     path('qtd_cilindros_cheios/', views.qtd_cilindros_cheios),

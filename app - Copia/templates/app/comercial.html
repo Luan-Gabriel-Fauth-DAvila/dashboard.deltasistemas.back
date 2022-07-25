@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/comercial.css' %}">
+{% endblock %}
+
+{% block title %}Painel | Comercial{% endblock %}
+
+{% block content %}
+    {% include 'components/navbar.html' %}
+    <section id="painel">
+        <div id="filter">
+            <div>
+                <label for="">Data Inicio</label>
+                <input type="date" id="data_ini">
+            </div>
+            <div>
+                <label for="">Data Fim</label>
+                <input type="date" id="data_fim">
+            </div>
+            <div>
+                <label for="">Agrupamento</label>
+                <select id="agrupamento">
+                    <option v-for="agr in agrupamentos" :key="agr.codagrupamento" :value="agr.codagrupamento">[[ agr.dscagrupamento ]]</option>
+                </select>
+            </div>
+            <div>
+                <button @click="defData" id="buttom_filter">Aplicar</button>
+            </div>
+        </div>
+        <div id="total_vendas">
+            <div>
+                <label>total de vendas</label>
+                <h4 id='total_vendas_value'>Sem dados</h4>
+            </div>
+            <span class="material-icons-outlined">trending_up</span>
+        </div>
+        <div id="total_cmv">
+            <div>
+                <label>CMV</label>
+                <h4 id="total_cmv_value">Sem dados</h4>
+            </div>
+            <span class="material-icons-outlined">leaderboard</span>
+        </div>
+        <div id="total_lucro_bruto">
+            <span class="material-icons-outlined">assessment</span>
+            <div>
+                <label>Lucro bruto</label>
+                <h4 id="total_lucro_bruto_value">Sem dados</h4>
+            </div>
+        </div>
+        <div id="valor_em_locacao">
+            <span class="material-icons-outlined">payments</span>
+            <div>
+                <label>Valor em locação</label>
+                <h4>Sem dados</h4>
+            </div>
+        </div>
+        <div id="total_vendas_mensal">
+            <span></span>
+            <div>
+                <h2>Vendas por Mês</h2>
+                <label>Total evolução <span class="material-icons-outlined" id="total_evolucao_arrow"></span><p id="total_evolucao"></p></label>
+            </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="total_vendas_mensal_chart"></div>
+            </div>
+        </div>
+        <div id="total_vendas_por_agrupamento">
+            <div>
+                <h2>Vendas por Agrupamento</h2>
+                <label for="">Por Mês</label>
+            </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <canvas id="total_vendas_por_agrupamento_chart"></canvas>
+            </div>
+        </div>
+        <div id="meta_de_vendas">
+            <div>
+                <h2>Meta de Vendas</h2>
+            </div>
+            <div>   
+                <div id="container_principal">
+                    <h6 id="barra_cliente" v-if="metadevendas_total" >[[ metadevendas_atual]] de [[ metadevendas_total ]]</h6>
+                    <h6 id="barra_cliente"  v-else >Sem dados</h6>
+                    <div id='barra_meta_vendas'>
+                        <div id="barra_porcentagem" :style="{ backgroundColor: colors[2], width: tamanhoBarra(metadevendas_atual, metadevendas_total) }">
+                            <b id="barra_valor" v-if="metadevendas_total">[[ tamanhoBarra(metadevendas_atual, metadevendas_total) ]] %</b>
+                            <b id="barra_valor" v-else>Sem Dados</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="ranking_de_vendas_por_vendedor">
+            <div>
+                <h2>Ranking de Vendas Por vendedor</h2>
+            </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="ranking_de_vendas_por_vendedor_chart"></div>
+            </div>
+        </div>
+        <div id="ranking_de_vendas_por_cliente">
+            <div>
+                <h2>Ranking de Vendas Por Cliente</h2>
+            </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <div id="ranking_de_vendas_por_cliente_chart"></div>
+            </div>
+        </div>
+        <div id="ranking_produtos_mais_vendidos">
+            <div>
+                <h2>Vendas Por Produto</h2>
+                <label for="">Mais Vendidos</label>
+            </div>
+            <div :style="{ maxHeight: '28vh' }">
+                <canvas id="produtos_mais_vendidos_chart"></canvas>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/comercial.js' %}"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
+{% endblock %}

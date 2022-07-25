@@ -1,0 +1,310 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 2vh;
+  font-family: 'Poppins', sans-serif;
+}
+small {
+    line-height: 2.5vh;
+    font-size: 1vh;
+}
+label {
+    margin: unset;
+    padding: unset;
+    line-height: 2.5vh;
+    font-size: 1.3vh;
+
+    display: flex;
+    align-items: center;
+}
+h2 {
+    font-size: 3vh;
+    line-height: 3vh;
+}
+h4 {
+    line-height: 2.5vh;
+}
+h6 {
+    margin-left: 1vh;
+    font-size: 1.5vh;
+    font-weight: bold;
+}
+
+
+/* Gráfico de Barra */
+#container_principal {
+    width: 90%;
+    height: 4.5vh;
+    margin: 0 auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#barra_total {
+    background-color: rgba(233, 237, 247, 1);
+    width: 100%;
+    height: 3vh;
+    border-radius: 4vh;
+}
+#barra_porcentagem {
+    background-color: #FF869C;
+    height: 3vh;
+    border-radius: 4vh;
+    white-space: nowrap;
+}
+#barra_valor {
+    margin-left: 2.5vh !important;
+    font-size: 1.5vh;
+    display: unset !important;
+}
+#barra_cliente {
+    width: 50%;
+    font-size: 1.5vh;
+}
+
+
+/* Fim Gráfico de Barra */
+
+
+#painel {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: 30vh 15vh 60vh 40vh 50vh;
+    grid-template-areas:    /*"filter filter filter filter"*/
+                            "saldo_em_conta saldo_em_conta saldo_em_conta saldo_em_conta"
+                            "cr_atrasado cr_vencer cp_atrasado cp_vencer"
+                            "contas_a_receber contas_a_receber contas_a_pagar contas_a_pagar"
+                            "recebimentos_por_forma recebimentos_por_forma emprestimos emprestimos"
+                            "fluxo_de_caixa fluxo_de_caixa fluxo_de_caixa fluxo_de_caixa";
+    margin: 0 10%;  
+    padding: 5% 0; 
+}
+@media only screen and (max-width: 630px) {
+  #painel {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 30vh 15vh 15vh 60vh 60vh 40vh 50vh;
+        grid-template-areas:    /*"filter filter"
+                                "filter filter"*/
+                                "saldo_em_conta saldo_em_conta"
+                                "cr_atrasado cr_vencer"
+                                "cp_atrasado cp_vencer"
+                                "contas_a_receber contas_a_receber"
+                                "contas_a_pagar contas_a_pagar"
+                                "recebimentos_por_forma recebimentos_por_forma"
+                                "emprestimos emprestimos"
+                                "fluxo_de_caixa fluxo_de_caixa";
+        margin: 0;  
+        padding: 5% 0;
+   
+    }
+}
+#filter {
+    grid-area: filter;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;  
+    align-items: center;
+
+    background: linear-gradient(135deg, rgb(67, 24, 255), rgb(134, 140, 255));
+    padding: 2vh 2vh;
+    margin: 2vh;
+    border-radius: .5vh;
+    color: #fff;
+    z-index: 0;
+}
+@media only screen and (max-width: 630px) {
+    #filter {
+        flex-direction: column;
+    }
+}
+#filter #data_ini,
+#filter #data_fim {
+    border: unset;
+    border-radius: 1vh;
+    padding: 1vh;
+}
+#buttom_filter {
+    border: unset;
+    padding: 1vh;
+    background-color: #fff;
+    color: #1B2559;
+    border-radius: .5vh;
+}
+#buttom_filter:hover {
+    box-shadow: 0 0 5px 0;
+    background-color: rgb(214, 214, 214);
+}
+#saldo_em_conta {
+    grid-area: saldo_em_conta;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+
+    display: flex;
+    flex-direction: column;
+}
+#banco_data {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+#banco_total {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 15vh;
+    height: 15vh;
+    margin: 2vh;
+    /* background-color: #e5e5e5; */
+    border-radius: 2vh;
+    margin-right: 15vh;
+}
+#banco {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 12vh;
+    height: 15vh;
+    margin: 2vh;
+    /* background-color: #e5e5e5; */
+    border-radius: 2vh;
+}
+
+
+
+
+
+#cr_atrasado {
+    grid-area: cr_atrasado;
+    color: #E5E5E5;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: .5vh 2vh 2vh 2vh;
+
+    background: linear-gradient(135deg, #05CD99 0%, #05CD55 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+}
+#cpr_title {
+    width: 100%;
+    text-align: center;
+}
+#cpr_value {
+    width: 100%;
+    text-align: center;
+}
+#cr_vencer {
+    grid-area: cr_vencer;
+    color: #E5E5E5;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: .5vh 2vh 2vh 2vh;
+
+    background: linear-gradient(135deg, #05CD99 0%, #05CD55 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+#cp_atrasado {
+    grid-area: cp_atrasado;
+    color: #E5E5E5;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: .5vh 2vh 2vh 2vh;
+    
+    background: linear-gradient(135deg, #CD0511 0%, #FF409A 94.06%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+#cp_vencer {
+    grid-area: cp_vencer;
+    color: #E5E5E5;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: .5vh 2vh 2vh 2vh;
+    
+    background: linear-gradient(135deg, #CD0511 0%, #FF409A 94.06%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+
+
+
+
+#contas_a_receber {
+    grid-area: contas_a_receber;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    
+}
+#contas_a_pagar {
+    grid-area: contas_a_pagar;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    
+}
+#recebimentos_por_forma {
+    grid-area: recebimentos_por_forma;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    
+}
+
+
+#emprestimos {
+    grid-area: emprestimos;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    
+}
+#emprestimos_title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+#fluxo_de_caixa {
+    grid-area: fluxo_de_caixa;
+    color: #1B2559;
+    background-color: white;
+    margin: 2vh;
+    border-radius: 2vh;
+    padding: 2vh 2vh;
+    
+}
+#fluxo_de_caixa_info {
+    display: flex;
+    align-items: center;
+}
+#dias_fluxo_caixa {
+    margin-left: 2.5vh
+}
