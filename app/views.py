@@ -529,6 +529,8 @@ def condicionais_abertas(request):
     cur.execute("""
     select first 6
         c.numcondicional,
+        c.parceiro,
+        p.nome,
         COALESCE(P.ENDERECO,'') as rua,
         COALESCE(P.MUNICIPIO,'') as cidade,
         'BRASIL' as pais
@@ -541,6 +543,8 @@ def condicionais_abertas(request):
 
     group by
         c.numcondicional,
+        c.parceiro,
+        p.nome,
         rua,
         cidade,
         pais
@@ -548,10 +552,12 @@ def condicionais_abertas(request):
     d = []
 
     for c in cur.fetchall():
-        geo = geopy.Geopy().request(street=str(c[1]), city=str(c[2]), country=str(c[3]))
+        geo = geopy.Geopy().request(street=str(c[3]), city=str(c[4]), country=str(c[5]))
 
         d.append({
             'numcondicional': str(c[0]),
+            'parceiro': str(c[1]),
+            'nome': str(c[2]),
             'lat': str(geo['lat']),
             'lon': str(geo['lon']),
         })
@@ -562,15 +568,9 @@ def mapa_de_locacoes(request):
     con = conn()
     cur = con.cursor()
     cur.execute("""
-    SELECT first 8
+    SELECT first 15
         C.NUMCONDICIONAL,
         P.PARCEIRO,
-        P.NOME,
-        COALESCE(P.ENDERECO,'') as rua,
-        COALESCE(P.MUNICIPIO,'') as cidade,
-        'BRASIL' as pais,
-
-        C.CODPRODUTO,
         PR.DSCPRODUTO,
         C.CODPRODUTO_CLAS,
         C.QTD AS QTD_LOCADA,
@@ -586,16 +586,11 @@ def mapa_de_locacoes(request):
     for c in cur.fetchall():
         d.append({
             'numcondicional': str(c[0]),
-            'parceiro': str(c[1]),
-            'nome': str(c[2]),
-            'rua': str(c[3]),
-            'cidade': str(c[4]),
-            'pais': str(c[5]),
-            'codproduto': str(c[6]),
-            'dscproduto': str(c[7]),
-            'codproduto_clas': str(c[8]),
-            'qtd_locada': str(c[9]),
-            'qtd_pendente': str(c[10]),
+            'codproduto': str(c[1]),
+            'dscproduto': str(c[2]),
+            'codproduto_clas': str(c[3]),
+            'qtd_locada': str(c[4]),
+            'qtd_pendente': str(c[5]),
         })
 
     con.close()

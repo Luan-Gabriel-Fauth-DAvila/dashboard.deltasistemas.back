@@ -36,7 +36,7 @@ urlpatterns = [
     path('contas_a_receber_do_inicio_ate_a_data_atual/', views.contas_a_receber_do_inicio_ate_a_data_atual),                    ##utilizado
     path('contas_a_pagar_do_inicio_ate_a_data_atual/', views.contas_a_pagar_do_inicio_ate_a_data_atual),                        ##utilizado
     path('contas_a_pagar_por_ranking_e_dia/', views.contas_a_pagar_por_ranking_e_dia),                                          ##utilizado
-    path('contas_a_receber_por_ranking_e_dia/', views.contas_a_receber_por_ranking_e_dia),                                        ##utilizado
+    path('contas_a_receber_por_ranking_e_dia/', views.contas_a_receber_por_ranking_e_dia),                                      ##utilizado
     path('detalhes_finaciamento/', views.detalhes_finaciamento),                                                                ##utilizado
     path('saldo_disponivel_em_contas/', views.saldo_disponivel_em_contas),                                                      ##utilizado
     path('fluxo_de_caixa/', views.fluxo_de_caixa),                                                                              ##utilizado
